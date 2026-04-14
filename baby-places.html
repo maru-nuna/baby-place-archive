@@ -440,8 +440,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
 }
 
 /* ── TOAST ───────────────────────────────────────────────────────── */
-.toast {
-  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(12px);
+.toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(12px);
   background: var(--text); color: #fff;
   padding: 11px 20px; border-radius: 100px;
   font-size: 13px; font-weight: 500; font-family: 'Pretendard', sans-serif;
@@ -451,7 +450,9 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
   transition: opacity 0.22s ease, transform 0.22s ease;
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast.error { background: var(--danger); }
+.toast.error   { background: var(--danger); }
+.toast.success { background: var(--sage-hover); }
+.toast.info    { background: var(--text-sub); }
 
 /* Input error highlight */
 .form-input.input-error,
@@ -1112,6 +1113,49 @@ function saveHome() {
   render();
 }
 
+// ─── GOOGLE SHEETS 연동 ───────────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzqQ12YBi58MIa9J9wJIe4joQFgM8muppLO9XvL1aMQXclgXh-wU80nKOzYHw_tMswsOg/exec';
+
+async function syncToSheet() {
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'save', places })
+    });
+  } catch(e) {
+    console.warn('시트 동기화 실패:', e);
+  }
+}
+
+async function loadFromSheet(showFeedback = false) {
+  try {
+    if (showFeedback) showToast('📋 데이터 불러오는 중...', 'info');
+    const res = await fetch(APPS_SCRIPT_URL + '?t=' + Date.now());
+    const data = await res.json();
+    if (data.result === 'success' && data.places.length > 0) {
+      places = data.places.map(p => ({
+        ...p,
+        id:      Number(p.id),
+        visited: p.visited === true || p.visited === 'TRUE',
+        feats:   Array.isArray(p.feats) ? p.feats : (p.feats ? p.feats.split('|') : []),
+        img:     p.img || null,
+      }));
+      localStorage.setItem('baby-places', JSON.stringify(places));
+      render();
+      if (showFeedback) showToast('✅ 데이터를 불러왔어요', 'success');
+    }
+  } catch(e) {
+    if (showFeedback) showToast('⚠️ 데이터 불러오기 실패', 'error');
+  }
+}
+
+function save() {
+  localStorage.setItem('baby-places', JSON.stringify(places));
+  syncToSheet();
+}
+
 // ─── MODAL HELPERS ─────────────────────────────────────────────────────
 function openModal(id) {
   document.getElementById(id).classList.add('open');
@@ -1125,6 +1169,7 @@ function closeOnOverlay(e, id) { if (e.target.id === id) closeModal(id); }
 
 // ─── INIT ──────────────────────────────────────────────────────────────
 render();
+loadFromSheet();
 </script>
 </body>
 </html>
