@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>베이비 플레이스 아카이브 🍼</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream:      #FAF7F4;
+  --warm-white: #FFFCFA;
+  --blush:      #F0C8B4;
+  --rose:       #E07B5A;
+  --rose-hover: #C96344;
+  --rose-light: rgba(224,123,90,0.1);
+  --sage:       #8BBF8C;
+  --sage-hover: #6BA86C;
+  --sage-light: rgba(139,191,140,0.12);
+  --sand:       #EDE0D4;
+  --sand-dark:  #D4C0AE;
+  --text:       #2C2018;
+  --text-sub:   #6B5040;
+  --text-muted: #A08878;
+  --card-bg:    #FFFFFF;
+  --shadow-sm:  0 1px 6px rgba(44,32,24,0.07);
+  --shadow-md:  0 6px 24px rgba(44,32,24,0.12);
+  --shadow-lg:  0 16px 48px rgba(44,32,24,0.18);
+  --border:     rgba(180,148,128,0.22);
+  --border-med: rgba(180,148,128,0.38);
+  --danger:     #D95050;
+  --radius-sm:  8px;
+  --radius-md:  14px;
+  --radius-lg:  20px;
+  --radius-xl:  28px;
+}
+
+body {
+  font-family: 'Pretendard', -apple-system, sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1;
+  background-image:
+    radial-gradient(ellipse 60% 40% at 10% 10%, rgba(240,200,180,0.2) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 90% 90%, rgba(139,191,140,0.13) 0%, transparent 60%);
+}
+
+/* ── HEADER ─────────────────────────────────────────────────────── */
+header {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(250,247,244,0.88);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border-bottom: 1px solid var(--border);
+}
+.header-inner {
+  max-width: 1040px; margin: 0 auto; padding: 0 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 62px;
+}
+.logo {
+  font-family: 'Fraunces', serif;
+  font-size: 19px; font-weight: 600; color: var(--rose);
+  letter-spacing: -0.3px;
+}
+.logo-sub {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px; font-weight: 400; color: var(--text-muted);
+  margin-left: 10px; letter-spacing: 0;
+}
+.header-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ── BUTTONS ─────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 8px 18px; border-radius: 100px;
+  border: none; cursor: pointer;
+  font-family: 'Pretendard', sans-serif;
+  font-size: 13px; font-weight: 500;
+  transition: all 0.18s ease; white-space: nowrap;
+}
+.btn-primary  { background: var(--rose); color: #fff; }
+.btn-primary:hover  { background: var(--rose-hover); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(224,123,90,0.35); }
+.btn-ghost    { background: transparent; color: var(--text-sub); border: 1.5px solid var(--border-med); }
+.btn-ghost:hover    { background: var(--sand); border-color: var(--sand-dark); }
+.btn-danger   { background: var(--danger); color: #fff; }
+.btn-danger:hover   { background: #be3a3a; transform: translateY(-1px); }
+.btn-sage     { background: var(--sage); color: #fff; }
+.btn-sage:hover     { background: var(--sage-hover); transform: translateY(-1px); }
+.btn-edit-mode{ background: var(--text); color: #fff; }
+.btn-edit-mode:hover{ background: var(--text-sub); }
+
+/* ── MAIN ────────────────────────────────────────────────────────── */
+main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
+
+/* ── BANNER ──────────────────────────────────────────────────────── */
+.banner {
+  background: linear-gradient(130deg, #F5D5C4 0%, #EDE0D4 55%, #D8E8D4 100%);
+  border-radius: var(--radius-xl); padding: 30px 36px 26px;
+  margin-bottom: 28px; position: relative; overflow: hidden;
+}
+.banner::after {
+  content: '🍼'; position: absolute; right: 32px; bottom: 14px;
+  font-size: 52px; opacity: 0.28; pointer-events: none;
+}
+.banner-title {
+  font-family: 'Fraunces', serif;
+  font-size: 20px; font-weight: 600; color: var(--rose);
+  margin-bottom: 5px; letter-spacing: -0.3px;
+}
+.banner-sub { font-size: 13px; color: var(--text-sub); font-weight: 400; }
+.banner-meta { display: flex; gap: 14px; margin-top: 16px; flex-wrap: wrap; align-items: center; }
+.banner-addr {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.55); backdrop-filter: blur(8px);
+  border-radius: 100px; padding: 5px 12px 5px 8px;
+  font-size: 12px; font-weight: 500; color: var(--rose);
+  border: 1px solid rgba(255,255,255,0.6);
+  cursor: pointer; transition: all 0.18s;
+}
+.banner-addr:hover { background: rgba(255,255,255,0.75); }
+.banner-count { font-size: 12px; color: var(--text-sub); }
+
+/* ── TOOLBAR (sort + edit) ───────────────────────────────────────── */
+.toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
+}
+.sort-group { display: flex; align-items: center; gap: 6px; }
+.sort-label { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-right: 2px; }
+.badge {
+  padding: 5px 14px; border-radius: 100px;
+  border: 1.5px solid var(--border-med);
+  background: #fff; color: var(--text-sub);
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all 0.16s; font-family: 'Pretendard', sans-serif;
+}
+.badge.active { background: var(--rose); color: #fff; border-color: var(--rose); box-shadow: 0 2px 10px rgba(224,123,90,0.3); }
+.badge:hover:not(.active) { border-color: var(--rose); color: var(--rose); }
+
+/* Edit mode bar */
+.edit-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--text); border-radius: 100px;
+  padding: 6px 8px 6px 16px; animation: slideIn 0.2s ease;
+}
+@keyframes slideIn { from { opacity:0; transform:translateX(8px); } to { opacity:1; transform:translateX(0); } }
+.edit-bar-label { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.75); }
+.edit-bar-count { font-size: 12px; font-weight: 700; color: #fff; margin-left: 2px; }
+.edit-bar-del {
+  background: var(--danger); color: #fff; border: none; cursor: pointer;
+  border-radius: 100px; padding: 5px 14px;
+  font-size: 12px; font-weight: 600; font-family: 'Pretendard', sans-serif;
+  transition: background 0.15s;
+}
+.edit-bar-del:disabled { background: rgba(255,255,255,0.2); cursor: default; color: rgba(255,255,255,0.4); }
+.edit-bar-del:not(:disabled):hover { background: #be3a3a; }
+.edit-bar-cancel {
+  background: transparent; color: rgba(255,255,255,0.7); border: none; cursor: pointer;
+  font-size: 12px; font-family: 'Pretendard', sans-serif; padding: 5px 10px; border-radius: 100px;
+  transition: color 0.15s;
+}
+.edit-bar-cancel:hover { color: #fff; }
+.edit-bar-selall {
+  background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25);
+  cursor: pointer; border-radius: 100px; padding: 5px 12px;
+  font-size: 12px; font-weight: 500; font-family: 'Pretendard', sans-serif;
+  transition: background 0.15s;
+}
+.edit-bar-selall:hover { background: rgba(255,255,255,0.25); }
+.edit-bar-sep { color: rgba(255,255,255,0.2); font-size: 12px; }
+
+/* ── GALLERY ─────────────────────────────────────────────────────── */
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+
+/* ── CARD ────────────────────────────────────────────────────────── */
+.card {
+  background: var(--card-bg); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm); transition: all 0.22s ease;
+  cursor: pointer; position: relative; display: flex; flex-direction: column;
+  border: 1.5px solid transparent;
+  overflow: hidden;
+}
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.card.visited { opacity: 0.58; }
+.card.edit-selected { border-color: var(--rose); box-shadow: 0 0 0 3px var(--rose-light); }
+
+/* Edit select overlay */
+.card-select-overlay {
+  position: absolute; top: 10px; left: 10px; z-index: 10;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: #fff; border: 2px solid var(--border-med);
+  display: none; align-items: center; justify-content: center;
+  transition: all 0.15s; box-shadow: var(--shadow-sm);
+}
+.edit-mode .card-select-overlay { display: flex; }
+.card.edit-selected .card-select-overlay {
+  background: var(--rose); border-color: var(--rose);
+}
+.card.edit-selected .card-select-overlay::after { content: '✓'; font-size: 11px; color: #fff; font-weight: 700; }
+
+/* Visited overlay */
+.card-img-wrap {
+  width: 100%; height: 158px; position: relative; overflow: hidden; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--sand) 0%, var(--blush) 100%);
+}
+.card-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.card.visited .card-img-wrap::after {
+  content: '✓ 다녀왔어요';
+  position: absolute; inset: 0;
+  background: rgba(139,191,140,0.62);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
+}
+.card-img-placeholder {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 7px; color: var(--text-muted); font-size: 30px;
+}
+.card-img-placeholder span { font-size: 11px; font-weight: 400; }
+
+.card-body { padding: 14px 16px 6px; flex: 1; }
+.card-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 10px; letter-spacing: -0.2px; }
+
+/* Tag rows */
+.card-tags-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+.tag {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 100px;
+}
+.tag-month { color: var(--rose); background: rgba(224,123,90,0.1); }
+.tag-dist  { color: #5C8F5C; background: rgba(139,191,140,0.15); }
+.tag-feat  { color: var(--text-sub); background: rgba(180,148,128,0.12); }
+
+.card-feature {
+  font-size: 12px; color: var(--text-muted); line-height: 1.55;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  margin-top: 6px;
+}
+.card-date { font-size: 10px; color: var(--text-muted); padding: 4px 16px 0; font-weight: 400; }
+.card-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 16px 14px; margin-top: 6px;
+  border-top: 1px solid var(--border);
+}
+.visit-btn {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; cursor: pointer;
+  background: none; border: none; font-family: 'Pretendard', sans-serif;
+  color: var(--text-muted); padding: 4px 0; transition: color 0.16s;
+}
+.visit-btn:hover:not(.checked) { color: var(--sage-hover); }
+.visit-btn.checked { color: var(--sage); }
+.checkmark {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 1.5px solid currentColor; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; transition: all 0.16s;
+}
+.visit-btn.checked .checkmark { background: var(--sage); border-color: var(--sage); color: #fff; }
+.edit-icon-btn {
+  background: none; border: none; cursor: pointer; color: var(--text-muted);
+  font-size: 14px; padding: 4px 6px; border-radius: var(--radius-sm);
+  transition: all 0.14s; display: flex; align-items: center;
+}
+.edit-icon-btn:hover { color: var(--rose); background: var(--rose-light); }
+.card-edit-actions { display: flex; gap: 2px; }
+
+/* Hide edit btn in edit mode */
+.edit-mode .card-edit-actions { display: none; }
+.edit-mode .visit-btn { display: none; }
+
+/* ── EMPTY STATE ─────────────────────────────────────────────────── */
+.empty-state { text-align: center; padding: 72px 24px; color: var(--text-muted); grid-column: 1/-1; }
+.empty-state .emoji { font-size: 56px; margin-bottom: 18px; }
+.empty-state p { font-size: 14px; line-height: 1.8; font-weight: 400; }
+
+/* ── OVERLAY ─────────────────────────────────────────────────────── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(28,18,10,0.42); backdrop-filter: blur(6px);
+  z-index: 300; display: flex; align-items: center; justify-content: center;
+  padding: 20px; opacity: 0; pointer-events: none;
+  transition: opacity 0.24s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+/* ── MODAL ───────────────────────────────────────────────────────── */
+.modal {
+  background: #fff; border-radius: var(--radius-xl);
+  padding: 32px; width: 100%; max-width: 480px;
+  max-height: 92vh; overflow-y: auto;
+  transform: translateY(18px) scale(0.98);
+  transition: transform 0.26s cubic-bezier(.34,1.36,.64,1);
+  box-shadow: var(--shadow-lg);
+}
+.overlay.open .modal { transform: translateY(0) scale(1); }
+.modal-title {
+  font-size: 17px; font-weight: 700; color: var(--text);
+  margin-bottom: 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  letter-spacing: -0.2px;
+}
+.modal-close {
+  background: var(--sand); border: none; cursor: pointer; width: 28px; height: 28px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--text-sub); transition: background 0.15s;
+}
+.modal-close:hover { background: var(--blush); }
+.modal-footer { display: flex; gap: 8px; margin-top: 24px; justify-content: flex-end; }
+
+/* ── FORM ────────────────────────────────────────────────────────── */
+.form-group { margin-bottom: 18px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 7px; display: block; letter-spacing: 0.1px; }
+.form-label .req { color: var(--rose); margin-left: 2px; }
+.form-input, .form-textarea, .form-select {
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid var(--border-med); border-radius: var(--radius-md);
+  font-size: 14px; font-family: 'Pretendard', sans-serif; font-weight: 400;
+  color: var(--text); background: var(--cream);
+  transition: border-color 0.16s, box-shadow 0.16s; outline: none;
+  appearance: none;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  border-color: var(--rose); box-shadow: 0 0 0 3px var(--rose-light);
+  background: #fff;
+}
+.form-input::placeholder, .form-textarea::placeholder { color: var(--text-muted); font-weight: 400; }
+.form-textarea { resize: vertical; min-height: 72px; line-height: 1.55; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-input[readonly] { background: var(--sand); color: var(--text-sub); cursor: default; }
+.form-input[readonly]:focus { border-color: var(--border-med); box-shadow: none; }
+
+/* select wrapper */
+.sel-wrap { position: relative; }
+.sel-wrap::after {
+  content: '▾'; position: absolute; right: 12px; top: 50%;
+  transform: translateY(-50%); color: var(--text-muted); pointer-events: none; font-size: 11px;
+}
+
+/* address row */
+.addr-wrap { display: flex; gap: 8px; }
+.addr-wrap .form-input { flex: 1; }
+.addr-btn {
+  padding: 10px 14px; border-radius: var(--radius-md);
+  background: var(--sand); border: 1.5px solid var(--sand-dark);
+  font-family: 'Pretendard', sans-serif; font-size: 13px; font-weight: 500;
+  color: var(--text-sub); cursor: pointer; white-space: nowrap; transition: all 0.16s;
+}
+.addr-btn:hover { background: var(--blush); border-color: var(--rose); color: var(--rose); }
+
+/* month row */
+.month-row { display: flex; align-items: center; gap: 8px; }
+.month-row .sel-wrap { flex: 1; }
+.month-sep { font-size: 13px; color: var(--text-muted); flex-shrink: 0; }
+.form-hint { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+
+/* dist status */
+.dist-hint { font-size: 11px; margin-top: 5px; }
+.dist-hint.need { color: var(--rose); }
+.dist-hint.ok   { color: var(--sage-hover); }
+
+/* checkboxes */
+.checkbox-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.check-item { display: flex; align-items: center; gap: 9px; cursor: pointer; }
+.check-item input { display: none; }
+.check-box {
+  width: 19px; height: 19px; border-radius: 6px; flex-shrink: 0;
+  border: 1.5px solid var(--border-med); background: var(--cream);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.16s;
+}
+.check-item input:checked + .check-box { background: var(--rose); border-color: var(--rose); }
+.check-item input:checked + .check-box::after { content: '✓'; font-size: 11px; color: #fff; font-weight: 700; }
+.check-label { font-size: 13px; font-weight: 400; color: var(--text-sub); }
+
+/* image */
+.img-upload-wrap {
+  border: 2px dashed var(--border-med); border-radius: var(--radius-md); padding: 18px;
+  text-align: center; cursor: pointer; transition: all 0.18s;
+  color: var(--text-muted); font-size: 13px; background: var(--cream); font-weight: 400;
+}
+.img-upload-wrap:hover { border-color: var(--rose); color: var(--rose); background: var(--rose-light); }
+.img-preview-img { width: 100%; border-radius: var(--radius-sm); margin-top: 10px; max-height: 180px; object-fit: cover; }
+
+/* ── HOME MODAL ──────────────────────────────────────────────────── */
+.home-note { font-size: 12px; color: var(--text-muted); line-height: 1.65; margin-bottom: 18px; }
+
+/* ── DETAIL MODAL ────────────────────────────────────────────────── */
+.detail-img { width: 100%; height: 210px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 18px; }
+.detail-no-img {
+  width: 100%; height: 140px; border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--sand), var(--blush));
+  display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: 18px;
+}
+.detail-name { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 12px; letter-spacing: -0.3px; }
+.detail-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.detail-tag { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 100px; }
+.detail-feature { font-size: 14px; color: var(--text-sub); line-height: 1.7; font-weight: 400; }
+.detail-date { font-size: 11px; color: var(--text-muted); margin-top: 12px; }
+
+/* ── CONFIRM MODALS ──────────────────────────────────────────────── */
+.confirm-modal { max-width: 360px; }
+.confirm-msg { font-size: 13px; color: var(--text-sub); line-height: 1.7; margin-bottom: 8px; }
+.confirm-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 22px; }
+.mini-modal { max-width: 340px; }
+.mini-modal .modal-title { justify-content: center; font-size: 16px; margin-bottom: 12px; }
+.mini-modal .modal-body { font-size: 13px; color: var(--text-sub); line-height: 1.7; text-align: center; margin-bottom: 20px; }
+.mini-modal .modal-footer { justify-content: center; }
+
+/* ── RESPONSIVE ──────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .gallery { grid-template-columns: 1fr 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .modal { padding: 24px 20px; }
+  main { padding: 22px 18px 48px; }
+  .banner { padding: 22px 24px 20px; }
+  .header-inner { padding: 0 18px; }
+}
+@media (max-width: 420px) {
+  .gallery { grid-template-columns: 1fr; }
+}
+
+/* ── TOAST ───────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(12px);
+  background: var(--text); color: #fff;
+  padding: 11px 20px; border-radius: 100px;
+  font-size: 13px; font-weight: 500; font-family: 'Pretendard', sans-serif;
+  box-shadow: 0 8px 24px rgba(44,32,24,0.22);
+  white-space: nowrap; z-index: 9999;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.error { background: var(--danger); }
+
+/* Input error highlight */
+.form-input.input-error {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(217,80,80,0.15) !important;
+  animation: shake 0.3s ease;
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-5px); }
+  75%      { transform: translateX(5px); }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="header-inner">
+    <div>
+      <span class="logo">베이비 플레이스 아카이브</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost" onclick="openHomeModal()">🏠 집주소</button>
+      <button class="btn btn-primary" onclick="openAddModal()">＋ 장소 추가</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- BANNER -->
+  <div class="banner">
+    <div class="banner-title">도영이랑 어디갈까? 🌿</div>
+    <div class="banner-sub">우리 가족이 놀러갈 곳들을 모아보자!</div>
+    <div class="banner-meta">
+      <div class="banner-addr" onclick="openHomeModal()">
+        <span>🏠</span><span id="homeAddrText">집주소를 설정해주세요</span>
+      </div>
+      <span class="banner-count" id="totalCount"></span>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="sort-group">
+      <span class="sort-label">정렬</span>
+      <button class="badge active" onclick="setSort('date')"  id="sort-date">등록순</button>
+      <button class="badge"        onclick="setSort('month')" id="sort-month">개월수순</button>
+      <button class="badge"        onclick="setSort('dist')"  id="sort-dist">거리순</button>
+    </div>
+    <div id="toolbarRight">
+      <button class="btn btn-ghost" id="editBtn" onclick="enterEditMode()" style="font-size:12px;padding:7px 16px">편집</button>
+    </div>
+  </div>
+
+  <!-- GALLERY -->
+  <div class="gallery" id="gallery"></div>
+</main>
+
+<!-- ══ ADD / EDIT MODAL ══ -->
+<div class="overlay" id="addOverlay">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="modalTitle">새 장소 추가</span>
+      <button class="modal-close" onclick="tryCancel()">✕</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">장소명 <span class="req">*</span></label>
+      <input class="form-input" id="inp-name" placeholder="예: 서울어린이대공원" />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">추천 개월 수 <span class="req">*</span></label>
+        <div class="month-row">
+          <div class="sel-wrap">
+            <select class="form-select" id="inp-month-from"><option value="">시작</option></select>
+          </div>
+          <span class="month-sep">~</span>
+          <div class="sel-wrap">
+            <select class="form-select" id="inp-month-to"><option value="">종료</option></select>
+          </div>
+        </div>
+        <div class="form-hint">종료 미선택 시 'N개월+' 표기</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">차로 걸리는 시간 <span class="req">*</span></label>
+        <div class="sel-wrap">
+          <select class="form-select" id="inp-dist"><option value="">선택해주세요</option></select>
+        </div>
+        <div class="dist-hint" id="distHint"></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">특징 / 메모 <span class="req">*</span></label>
+      <textarea class="form-textarea" id="inp-feature" placeholder="예: 유모차 접근 좋음, 주차 편리 등"></textarea>
+      <div class="checkbox-group">
+        <label class="check-item">
+          <input type="checkbox" value="🍼 수유실 있음">
+          <div class="check-box"></div>
+          <span class="check-label">🍼 수유실 있음</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" value="🛒 유모차 대여 가능">
+          <div class="check-box"></div>
+          <span class="check-label">🛒 유모차 대여 가능</span>
+        </label>
+        <label class="check-item">
+          <input type="checkbox" value="🎟 무료 입장">
+          <div class="check-box"></div>
+          <span class="check-label">🎟 무료 입장</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">장소 사진</label>
+      <div class="img-upload-wrap" onclick="document.getElementById('imgInput').click()">
+        📷 사진을 클릭해서 추가하세요
+        <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="handleImg(event)">
+      </div>
+      <img id="imgPreview" class="img-preview-img" style="display:none" />
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="tryCancel()">취소</button>
+      <button class="btn btn-primary" onclick="savePlace()">저장하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOME MODAL ══ -->
+<div class="overlay" id="homeOverlay">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-title">
+      <span>🏠 집주소 설정</span>
+      <button class="modal-close" onclick="closeModal('homeOverlay')">✕</button>
+    </div>
+    <p class="home-note">집주소를 입력하면 장소 추가 시 기준 주소로 안내해드려요. 차로 걸리는 시간은 네이버 지도를 참고해 선택해주세요.</p>
+    <div class="form-group">
+      <label class="form-label">집주소</label>
+      <input class="form-input" id="homeInput" placeholder="예: 서울 마포구 합정동" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">상세주소 <span style="color:var(--text-muted);font-weight:400">(선택)</span></label>
+      <input class="form-input" id="homeDetail" placeholder="동/호수 등 상세주소" />
+    </div>
+    <div class="modal-footer" id="homeFooter"></div>
+  </div>
+</div>
+
+<!-- ══ DETAIL MODAL ══ -->
+<div class="overlay" id="detailOverlay" onclick="closeOnOverlay(event,'detailOverlay')">
+  <div class="modal">
+    <div class="modal-title">
+      <span>장소 상세</span>
+      <button class="modal-close" onclick="closeModal('detailOverlay')">✕</button>
+    </div>
+    <div id="detailBody"></div>
+  </div>
+</div>
+
+<!-- ══ DELETE CONFIRM MODAL ══ -->
+<div class="overlay" id="deleteOverlay">
+  <div class="modal confirm-modal">
+    <div class="modal-title">
+      <span>🗑 장소 삭제</span>
+      <button class="modal-close" onclick="closeModal('deleteOverlay')">✕</button>
+    </div>
+    <p class="confirm-msg" id="deleteMsg">선택한 장소를 삭제할까요?<br>삭제 후에는 되돌릴 수 없어요.</p>
+    <p class="confirm-name" id="deleteName"></p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('deleteOverlay')">취소</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">삭제하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CANCEL GUARD MODAL ══ -->
+<div class="overlay" id="cancelOverlay">
+  <div class="modal mini-modal">
+    <div class="modal-title"><span>✋ 작성을 중단할까요?</span></div>
+    <div class="modal-body">입력 중인 내용이 있어요.<br>취소하면 내용이 모두 사라져요.</div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('cancelOverlay')">계속 작성</button>
+      <button class="btn btn-primary" onclick="forceCancel()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast"></div>
+
+<script>
+
+// ─── STATE ────────────────────────────────────────────────────────────
+let places      = JSON.parse(localStorage.getItem('baby-places') || '[]');
+let homeAddress = localStorage.getItem('baby-home') || '';
+let homeDetail  = localStorage.getItem('baby-home-detail') || '';
+let sortMode    = 'date';
+let editingId   = null;
+let currentImg  = null;
+let editMode    = false;
+let selectedIds = new Set();
+
+// Snapshot for change detection in edit modal
+let originalSnapshot = null;
+
+// ─── INIT DROPDOWNS ───────────────────────────────────────────────────
+(function initDropdowns() {
+  const mf = document.getElementById('inp-month-from');
+  const mt = document.getElementById('inp-month-to');
+  for (let i = 0; i <= 24; i++) {
+    mf.appendChild(new Option(`${i}개월`, String(i)));
+    mt.appendChild(new Option(`${i}개월`, String(i)));
+  }
+
+  const ds = document.getElementById('inp-dist');
+  const times = [
+    '10분 이내','15분','20분','25분','30분','35분','40분','45분',
+    '50분','1시간','1시간 10분','1시간 20분','1시간 30분','2시간 이상'
+  ];
+  times.forEach(t => ds.appendChild(new Option(t, t)));
+})();
+
+// ─── UTILS ────────────────────────────────────────────────────────────
+function save() { localStorage.setItem('baby-places', JSON.stringify(places)); }
+
+function formatDate(ts) {
+  const d = new Date(ts);
+  return `${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')} 등록`;
+}
+
+function monthLabel(p) {
+  const from = (p.monthFrom !== '' && p.monthFrom != null) ? `${p.monthFrom}개월` : null;
+  if (!from) return '';
+  const to = (p.monthTo !== '' && p.monthTo != null) ? `~${p.monthTo}개월` : '+';
+  return from + to;
+}
+
+function getCheckedFeats() {
+  return [...document.querySelectorAll('#addOverlay .check-item input:checked')].map(c => c.value);
+}
+
+function getSnapshot() {
+  return JSON.stringify({
+    name:      document.getElementById('inp-name').value,
+    monthFrom: document.getElementById('inp-month-from').value,
+    monthTo:   document.getElementById('inp-month-to').value,
+    dist:      document.getElementById('inp-dist').value,
+    feature:   document.getElementById('inp-feature').value,
+    feats:     getCheckedFeats(),
+    img:       currentImg
+  });
+}
+
+function isDirty() {
+  return getSnapshot() !== originalSnapshot;
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────
+function render() {
+  const fullAddr = homeAddress
+    ? (homeDetail ? `${homeAddress} ${homeDetail}` : homeAddress)
+    : '';
+  document.getElementById('homeAddrText').textContent = fullAddr || '집주소를 설정해주세요';
+
+  const total = places.length;
+  const vis   = places.filter(p => p.visited).length;
+  document.getElementById('totalCount').textContent =
+    total ? `총 ${total}곳 · 다녀온 곳 ${vis}곳` : '';
+
+  const nv = places.filter(p => !p.visited);
+  const v  = places.filter(p => p.visited);
+
+  function sortFn(arr) {
+    if (sortMode === 'month')
+      return [...arr].sort((a,b) => (parseInt(a.monthFrom) ?? 999) - (parseInt(b.monthFrom) ?? 999));
+    if (sortMode === 'dist') {
+      const order = [
+        '10분 이내','15분','20분','25분','30분','35분','40분','45분',
+        '50분','1시간','1시간 10분','1시간 20분','1시간 30분','2시간 이상'
+      ];
+      return [...arr].sort((a,b) => {
+        const ai = order.indexOf(a.dist); const bi = order.indexOf(b.dist);
+        return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+      });
+    }
+    return [...arr].sort((a,b) => a.id - b.id);
+  }
+
+  const list = [...sortFn(nv), ...sortFn(v)];
+  const gallery = document.getElementById('gallery');
+
+  if (!list.length) {
+    gallery.innerHTML = `<div class="empty-state"><div class="emoji">🍼</div><p>아직 저장된 장소가 없어요.<br>+ 장소 추가 버튼으로 첫 번째 장소를 등록해보세요!</p></div>`;
+    updateEditBtn();
+    return;
+  }
+  gallery.innerHTML = list.map(cardHTML).join('');
+  updateEditBtn();
+}
+
+function cardHTML(p) {
+  const img = p.img
+    ? `<img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover">`
+    : `<div class="card-img-placeholder"><span>📍</span><span>사진 없음</span></div>`;
+
+  const ml  = monthLabel(p);
+  const r1  = [
+    ml ? `<span class="tag tag-month">👶 ${ml}</span>` : '',
+    p.dist ? `<span class="tag tag-dist">🚗 ${p.dist}</span>` : ''
+  ].filter(Boolean).join('');
+
+  const r2  = (p.feats || []).map(f => `<span class="tag tag-feat">${f}</span>`).join('');
+
+  const sel = selectedIds.has(p.id);
+
+  return `
+  <div class="card${p.visited ? ' visited' : ''}${sel ? ' edit-selected' : ''}"
+       onclick="onCardClick(event,${p.id})" data-id="${p.id}">
+    <div class="card-select-overlay"></div>
+    <div class="card-img-wrap">${img}</div>
+    <div class="card-body">
+      <div class="card-name">${p.name}</div>
+      ${r1 ? `<div class="card-tags-row">${r1}</div>` : ''}
+      ${r2 ? `<div class="card-tags-row">${r2}</div>` : ''}
+      ${p.feature ? `<div class="card-feature">${p.feature}</div>` : ''}
+    </div>
+    <div class="card-date">${formatDate(p.id)}</div>
+    <div class="card-footer">
+      <button class="visit-btn${p.visited ? ' checked' : ''}" onclick="toggleVisit(event,${p.id})">
+        <div class="checkmark">${p.visited ? '✓' : ''}</div>
+        다녀왔어요!
+      </button>
+      <div class="card-edit-actions">
+        <button class="edit-icon-btn" onclick="openEdit(event,${p.id})" title="수정">✏️</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ─── EDIT MODE (bulk delete) ──────────────────────────────────────────
+function enterEditMode() {
+  editMode = true; selectedIds.clear();
+  document.getElementById('gallery').classList.add('edit-mode');
+  renderEditBar();
+  render();
+}
+
+function renderEditBar() {
+  const allCount = places.length;
+  const isAll = selectedIds.size > 0 && selectedIds.size === allCount;
+  document.getElementById('toolbarRight').innerHTML = `
+    <div class="edit-bar">
+      <button class="edit-bar-selall" id="selAllBtn" onclick="toggleSelectAll()">
+        ${isAll ? '전체 해제' : '전체 선택'}
+      </button>
+      <span class="edit-bar-sep">|</span>
+      <span class="edit-bar-label">선택됨</span>
+      <span class="edit-bar-count" id="selCount">${selectedIds.size}</span>
+      <button class="edit-bar-del" id="delSelBtn" onclick="askBulkDelete()" ${selectedIds.size === 0 ? 'disabled' : ''}>삭제</button>
+      <button class="edit-bar-cancel" onclick="exitEditMode()">완료</button>
+    </div>`;
+}
+
+function toggleSelectAll() {
+  const allIds = places.map(p => p.id);
+  const isAll = selectedIds.size === allIds.length && allIds.length > 0;
+  if (isAll) {
+    selectedIds.clear();
+  } else {
+    allIds.forEach(id => selectedIds.add(id));
+  }
+  renderEditBar();
+  render();
+}
+
+function exitEditMode() {
+  editMode = false; selectedIds.clear();
+  document.getElementById('gallery').classList.remove('edit-mode');
+  document.getElementById('toolbarRight').innerHTML =
+    `<button class="btn btn-ghost" id="editBtn" onclick="enterEditMode()" style="font-size:12px;padding:7px 16px">편집</button>`;
+  updateEditBtn();
+  render();
+}
+
+function updateEditBtn() {
+  const btn = document.getElementById('editBtn');
+  if (!btn) return;
+  if (places.length === 0) {
+    btn.disabled = true;
+    btn.style.opacity = '0.38';
+    btn.style.cursor = 'default';
+    btn.style.pointerEvents = 'none';
+  } else {
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.cursor = '';
+    btn.style.pointerEvents = '';
+  }
+}
+
+function updateSelCount() {
+  renderEditBar();
+}
+
+function onCardClick(e, id) {
+  if (editMode) {
+    e.stopPropagation();
+    if (selectedIds.has(id)) selectedIds.delete(id);
+    else selectedIds.add(id);
+    updateSelCount();
+    // toggle class without full re-render
+    const card = document.querySelector(`.card[data-id="${id}"]`);
+    if (card) {
+      card.classList.toggle('edit-selected', selectedIds.has(id));
+      const ov = card.querySelector('.card-select-overlay');
+      if (ov) ov.innerHTML = selectedIds.has(id) ? '' : '';
+    }
+    return;
+  }
+  openDetail(id);
+}
+
+function askBulkDelete() {
+  if (selectedIds.size === 0) return;
+  const n = selectedIds.size;
+  document.getElementById('deleteMsg').innerHTML = `선택한 장소 <strong>${n}곳</strong>을 삭제할까요?<br>삭제 후에는 되돌릴 수 없어요.`;
+  document.getElementById('deleteName').textContent = '';
+  openModal('deleteOverlay');
+}
+
+function confirmDelete() {
+  if (selectedIds.size > 0) {
+    places = places.filter(p => !selectedIds.has(p.id));
+    selectedIds.clear();
+  }
+  save(); render();
+  closeModal('deleteOverlay');
+  if (editMode) { updateSelCount(); }
+}
+
+// ─── SORT ─────────────────────────────────────────────────────────────
+function setSort(mode) {
+  sortMode = mode;
+  document.querySelectorAll('.badge').forEach(b => b.classList.remove('active'));
+  document.getElementById('sort-' + mode).classList.add('active');
+  render();
+}
+
+// ─── VISIT ────────────────────────────────────────────────────────────
+function toggleVisit(e, id) {
+  e.stopPropagation();
+  const p = places.find(x => x.id === id);
+  if (p) { p.visited = !p.visited; save(); render(); }
+}
+
+// ─── DETAIL ───────────────────────────────────────────────────────────
+function openDetail(id) {
+  const p = places.find(x => x.id === id);
+  if (!p) return;
+
+  const imgHTML = p.img
+    ? `<img class="detail-img" src="${p.img}" alt="${p.name}">`
+    : `<div class="detail-no-img">📍</div>`;
+
+  const ml = monthLabel(p);
+  const tags = [
+    ml ? `<span class="detail-tag tag-month">👶 ${ml}</span>` : '',
+    p.dist ? `<span class="detail-tag tag-dist">🚗 ${p.dist}</span>` : '',
+    ...(p.feats||[]).map(f=>`<span class="detail-tag tag-feat">${f}</span>`),
+    p.visited ? `<span class="detail-tag" style="background:var(--sage-light);color:var(--sage-hover)">✓ 다녀왔어요</span>` : ''
+  ].filter(Boolean).join('');
+
+  document.getElementById('detailBody').innerHTML = `
+    ${imgHTML}
+    <div class="detail-name">${p.name}</div>
+    <div class="detail-tags">${tags}</div>
+    ${p.feature ? `<div class="detail-feature">${p.feature}</div>` : ''}
+    <div class="detail-date">${formatDate(p.id)}</div>
+    <div style="margin-top:20px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('detailOverlay');openEdit(null,${p.id})">수정</button>
+      <button class="btn btn-sage" onclick="toggleVisit(new Event('c'),${p.id});closeModal('detailOverlay')">
+        ${p.visited ? '미방문으로 변경' : '✓ 다녀왔어요!'}
+      </button>
+    </div>`;
+  openModal('detailOverlay');
+}
+
+// ─── ADD / EDIT ────────────────────────────────────────────────────────
+function resetForm() {
+  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-month-from').value = '';
+  document.getElementById('inp-month-to').value = '';
+  document.getElementById('inp-dist').value = '';
+  document.getElementById('inp-feature').value = '';
+  document.getElementById('imgInput').value = '';
+  document.getElementById('imgPreview').style.display = 'none';
+  document.getElementById('imgPreview').src = '';
+  document.querySelectorAll('#addOverlay .check-item input').forEach(c => c.checked = false);
+  currentImg = null;
+}
+
+function openAddModal() {
+  editingId = null;
+  resetForm();
+  updateDistHint();
+  document.getElementById('modalTitle').textContent = '새 장소 추가';
+  originalSnapshot = getSnapshot();
+  openModal('addOverlay');
+}
+
+function openEdit(e, id) {
+  if (e) e.stopPropagation();
+  const p = places.find(x => x.id === id);
+  if (!p) return;
+  editingId = id;
+  resetForm();
+  document.getElementById('inp-name').value = p.name;
+  document.getElementById('inp-month-from').value = p.monthFrom ?? '';
+  document.getElementById('inp-month-to').value   = p.monthTo ?? '';
+  document.getElementById('inp-dist').value = p.dist || '';
+  document.getElementById('inp-feature').value = p.feature || '';
+  document.querySelectorAll('#addOverlay .check-item input').forEach(c => {
+    c.checked = (p.feats || []).includes(c.value);
+  });
+  currentImg = p.img || null;
+  if (p.img) { document.getElementById('imgPreview').src = p.img; document.getElementById('imgPreview').style.display = 'block'; }
+  updateDistHint();
+  document.getElementById('modalTitle').textContent = '장소 수정';
+  originalSnapshot = getSnapshot();  // snapshot AFTER populating
+  openModal('addOverlay');
+}
+
+function updateDistHint() {
+  const el = document.getElementById('distHint');
+  if (!homeAddress) { el.textContent = '집주소 설정 필요'; el.className = 'dist-hint need'; }
+  else {
+    const full = homeDetail ? `${homeAddress} ${homeDetail}` : homeAddress;
+    el.textContent = `기준: ${full}`; el.className = 'dist-hint ok';
+  }
+}
+
+function handleImg(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    currentImg = ev.target.result;
+    document.getElementById('imgPreview').src = currentImg;
+    document.getElementById('imgPreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function tryCancel() {
+  if (isDirty()) { openModal('cancelOverlay'); return; }
+  closeModal('addOverlay');
+}
+function forceCancel() { closeModal('cancelOverlay'); closeModal('addOverlay'); }
+
+function savePlace() {
+  const name      = document.getElementById('inp-name').value.trim();
+  const monthFrom = document.getElementById('inp-month-from').value;
+  const monthTo   = document.getElementById('inp-month-to').value;
+  const dist      = document.getElementById('inp-dist').value;
+  const feature   = document.getElementById('inp-feature').value.trim();
+  const feats     = getCheckedFeats();
+
+  const errs = [];
+  if (!name) errs.push('장소명');
+  if (monthFrom === '') errs.push('추천 개월 수');
+  if (!dist) errs.push('차로 걸리는 시간');
+  if (!feature && feats.length === 0) errs.push('특징 / 메모 (텍스트 입력 또는 항목 선택)');
+  if (errs.length) { alert(`필수 항목을 입력해주세요:\n• ${errs.join('\n• ')}`); return; }
+
+  if (editingId !== null) {
+    const p = places.find(x => x.id === editingId);
+    if (p) Object.assign(p, { name, monthFrom, monthTo, dist, feature, feats, img: currentImg });
+  } else {
+    places.push({ id: Date.now(), name, monthFrom, monthTo, dist, feature, feats, img: currentImg, visited: false });
+  }
+  save(); render();
+  closeModal('addOverlay');
+}
+
+// ─── HOME ADDRESS ──────────────────────────────────────────────────────
+function openHomeModal() {
+  document.getElementById('homeInput').value  = homeAddress;
+  document.getElementById('homeDetail').value = homeDetail;
+  renderHomeFooter();
+  openModal('homeOverlay');
+}
+
+function renderHomeFooter() {
+  document.getElementById('homeFooter').innerHTML = homeAddress
+    ? `<button class="btn btn-ghost" onclick="closeModal('homeOverlay')">닫기</button>
+       <button class="btn btn-primary" onclick="saveHome()">수정</button>`
+    : `<button class="btn btn-primary" onclick="saveHome()">저장</button>`;
+}
+
+// ─── TOAST ─────────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg, type = 'error') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast ${type} show`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.classList.remove('show'); }, 2800);
+}
+
+function saveHome() {
+  const input = document.getElementById('homeInput');
+  const val = input.value.trim();
+  if (!val) {
+    input.classList.add('input-error');
+    input.addEventListener('input', () => input.classList.remove('input-error'), { once: true });
+    showToast('🏠 집주소를 입력해주세요');
+    input.focus();
+    return;
+  }
+  homeAddress = val;
+  homeDetail  = document.getElementById('homeDetail').value.trim();
+  localStorage.setItem('baby-home', homeAddress);
+  localStorage.setItem('baby-home-detail', homeDetail);
+  closeModal('homeOverlay');
+  render();
+}
+
+// ─── MODAL HELPERS ─────────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  if (!document.querySelector('.overlay.open')) document.body.style.overflow = '';
+}
+function closeOnOverlay(e, id) { if (e.target.id === id) closeModal(id); }
+
+// ─── INIT ──────────────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
