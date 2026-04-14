@@ -218,9 +218,24 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
 .card-img-placeholder {
   width: 100%; height: 100%;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 7px; color: var(--text-muted); font-size: 30px;
+  gap: 10px; position: relative; overflow: hidden;
 }
-.card-img-placeholder span { font-size: 11px; font-weight: 400; }
+.card-img-placeholder .ph-initial {
+  font-family: 'Fraunces', serif;
+  font-size: 48px; font-weight: 600; line-height: 1;
+  color: rgba(255,255,255,0.9);
+  text-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  letter-spacing: -1px;
+  z-index: 1;
+}
+.card-img-placeholder .ph-label {
+  font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  background: rgba(0,0,0,0.1);
+  padding: 3px 10px; border-radius: 100px;
+  z-index: 1;
+  max-width: 90%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 
 .card-body { padding: 14px 16px 6px; flex: 1; }
 .card-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 10px; letter-spacing: -0.2px; }
@@ -439,7 +454,8 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
 .toast.error { background: var(--danger); }
 
 /* Input error highlight */
-.form-input.input-error {
+.form-input.input-error,
+.form-select.input-error {
   border-color: var(--danger) !important;
   box-shadow: 0 0 0 3px rgba(217,80,80,0.15) !important;
   animation: shake 0.3s ease;
@@ -521,7 +537,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
             <select class="form-select" id="inp-month-to"><option value="">종료</option></select>
           </div>
         </div>
-        <div class="form-hint">종료 미선택 시 'N개월+' 표기</div>
+        <div class="form-hint">시작~종료 개월 수를 모두 선택해주세요</div>
       </div>
       <div class="form-group">
         <label class="form-label">차로 걸리는 시간 <span class="req">*</span></label>
@@ -533,7 +549,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
     </div>
 
     <div class="form-group">
-      <label class="form-label">특징 / 메모 <span class="req">*</span></label>
+      <label class="form-label">특이사항 <span style="color:var(--text-muted);font-weight:400">(선택)</span></label>
       <textarea class="form-textarea" id="inp-feature" placeholder="예: 유모차 접근 좋음, 주차 편리 등"></textarea>
       <div class="checkbox-group">
         <label class="check-item">
@@ -555,9 +571,9 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
     </div>
 
     <div class="form-group">
-      <label class="form-label">장소 사진</label>
+      <label class="form-label">장소 사진 <span style="color:var(--text-muted);font-weight:400">(선택)</span></label>
       <div class="img-upload-wrap" onclick="document.getElementById('imgInput').click()">
-        📷 사진을 클릭해서 추가하세요
+        📷 사진 추가
         <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="handleImg(event)">
       </div>
       <img id="imgPreview" class="img-preview-img" style="display:none" />
@@ -675,7 +691,7 @@ function formatDate(ts) {
 function monthLabel(p) {
   const from = (p.monthFrom !== '' && p.monthFrom != null) ? `${p.monthFrom}개월` : null;
   if (!from) return '';
-  const to = (p.monthTo !== '' && p.monthTo != null) ? `~${p.monthTo}개월` : '+';
+  const to = (p.monthTo !== '' && p.monthTo != null) ? `~${p.monthTo}개월` : '';
   return from + to;
 }
 
@@ -743,9 +759,25 @@ function render() {
 }
 
 function cardHTML(p) {
+  // 사진 없을 때 장소명 첫 글자 + 고유 그라디언트
+  const gradients = [
+    'linear-gradient(135deg, #F2C4A8 0%, #E8957A 100%)',
+    'linear-gradient(135deg, #B8D4B8 0%, #7BA872 100%)',
+    'linear-gradient(135deg, #C4D4E8 0%, #7A95C9 100%)',
+    'linear-gradient(135deg, #E8D4B8 0%, #C9A87A 100%)',
+    'linear-gradient(135deg, #D4B8E8 0%, #A87AC9 100%)',
+    'linear-gradient(135deg, #B8E8D4 0%, #7AC9A8 100%)',
+    'linear-gradient(135deg, #E8B8C4 0%, #C97A8A 100%)',
+  ];
+  const grad = gradients[p.id % gradients.length];
+  const initial = p.name ? p.name.charAt(0) : '📍';
+
   const img = p.img
     ? `<img src="${p.img}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover">`
-    : `<div class="card-img-placeholder"><span>📍</span><span>사진 없음</span></div>`;
+    : `<div class="card-img-placeholder" style="background:${grad}">
+        <div class="ph-initial">${initial}</div>
+        <div class="ph-label">${p.name}</div>
+      </div>`;
 
   const ml  = monthLabel(p);
   const r1  = [
@@ -940,6 +972,7 @@ function resetForm() {
   document.getElementById('imgPreview').style.display = 'none';
   document.getElementById('imgPreview').src = '';
   document.querySelectorAll('#addOverlay .check-item input').forEach(c => c.checked = false);
+  document.querySelectorAll('#addOverlay .input-error').forEach(el => el.classList.remove('input-error'));
   currentImg = null;
 }
 
@@ -1008,12 +1041,23 @@ function savePlace() {
   const feature   = document.getElementById('inp-feature').value.trim();
   const feats     = getCheckedFeats();
 
-  const errs = [];
-  if (!name) errs.push('장소명');
-  if (monthFrom === '') errs.push('추천 개월 수');
-  if (!dist) errs.push('차로 걸리는 시간');
-  if (!feature && feats.length === 0) errs.push('특징 / 메모 (텍스트 입력 또는 항목 선택)');
-  if (errs.length) { alert(`필수 항목을 입력해주세요:\n• ${errs.join('\n• ')}`); return; }
+  // 필수 항목 검사 + 강조
+  const invalidFields = [];
+  if (!name)        invalidFields.push(document.getElementById('inp-name'));
+  if (!monthFrom)   invalidFields.push(document.getElementById('inp-month-from'));
+  if (!monthTo)     invalidFields.push(document.getElementById('inp-month-to'));
+  if (!dist)        invalidFields.push(document.getElementById('inp-dist'));
+
+  if (invalidFields.length) {
+    showToast('⚠️ 필수 항목을 모두 입력해주세요');
+    invalidFields.forEach(el => {
+      el.classList.add('input-error');
+      el.addEventListener('change', () => el.classList.remove('input-error'), { once: true });
+      el.addEventListener('input',  () => el.classList.remove('input-error'), { once: true });
+    });
+    invalidFields[0].focus();
+    return;
+  }
 
   if (editingId !== null) {
     const p = places.find(x => x.id === editingId);
