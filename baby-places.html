@@ -175,6 +175,59 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
 
 /* ── GALLERY ─────────────────────────────────────────────────────── */
 .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.gallery.list-view { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── LIST CARD ───────────────────────────────────────────────────── */
+.gallery.list-view .card {
+  flex-direction: row; border-radius: var(--radius-md);
+  min-height: 88px;
+}
+.gallery.list-view .card:hover { transform: translateY(-2px); }
+.gallery.list-view .card-img-wrap {
+  width: 80px; min-height: 88px; height: auto; flex-shrink: 0; border-radius: 0;
+}
+.gallery.list-view .card.visited .card-img-wrap::after { font-size: 10px; }
+.gallery.list-view .card-img-placeholder .ph-initial { font-size: 26px; }
+.gallery.list-view .card-img-placeholder .ph-label { display: none; }
+.gallery.list-view .card-select-overlay { top: 8px; left: 8px; }
+
+/* 본문 영역 */
+.gallery.list-view .card-body {
+  padding: 10px 12px 6px; flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;
+}
+.gallery.list-view .card-name { font-size: 13px; margin-bottom: 5px; }
+.gallery.list-view .card-tags-row { min-height: unset; margin-bottom: 3px; }
+.gallery.list-view .card-feature { font-size: 11px; -webkit-line-clamp: 1; margin-top: 2px; }
+
+/* 등록일: 갤러리=하단 블록, 리스트=본문 인라인 */
+.card-date-inline { display: none; font-size: 10px; color: var(--text-muted); margin-top: 6px; padding-bottom: 2px; }
+.gallery.list-view .card-date-block { display: none; }
+.gallery.list-view .card-date-inline { display: block; }
+
+/* 푸터: 세로 중앙 정렬, 우측 고정 */
+.gallery.list-view .card-footer {
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 0 14px; gap: 6px;
+  border-top: none; border-left: 1px solid var(--border);
+  min-width: 80px; flex-shrink: 0; margin-top: 0;
+}
+.gallery.list-view .visit-btn {
+  flex-direction: column; gap: 3px;
+  font-size: 10px; text-align: center;
+}
+.gallery.list-view .edit-icon-btn { font-size: 13px; }
+
+/* View toggle buttons */
+.view-toggle { display: flex; gap: 4px; }
+.view-btn {
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-med); background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s; color: var(--text-muted);
+  font-size: 14px;
+}
+.view-btn.active { background: var(--rose); border-color: var(--rose); color: #fff; }
+.view-btn:hover:not(.active) { border-color: var(--rose); color: var(--rose); }
 
 /* ── CARD ────────────────────────────────────────────────────────── */
 .card {
@@ -220,28 +273,33 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 10px; position: relative; overflow: hidden;
 }
+.card-img-placeholder::before {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(0,0,0,0.08);
+}
 .card-img-placeholder .ph-initial {
   font-family: 'Fraunces', serif;
-  font-size: 48px; font-weight: 600; line-height: 1;
-  color: rgba(255,255,255,0.9);
-  text-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  font-size: 52px; font-weight: 600; line-height: 1;
+  color: rgba(255,255,255,0.95);
+  text-shadow: 0 2px 16px rgba(0,0,0,0.2);
   letter-spacing: -1px;
   z-index: 1;
 }
 .card-img-placeholder .ph-label {
-  font-size: 11px; font-weight: 500;
-  color: rgba(255,255,255,0.75);
-  background: rgba(0,0,0,0.1);
+  font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  background: rgba(0,0,0,0.18);
   padding: 3px 10px; border-radius: 100px;
   z-index: 1;
-  max-width: 90%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  max-width: 85%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  letter-spacing: 0.2px;
 }
 
 .card-body { padding: 14px 16px 6px; flex: 1; }
 .card-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 10px; letter-spacing: -0.2px; }
 
 /* Tag rows */
-.card-tags-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; }
+.card-tags-row { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; min-height: 22px; }
 .tag {
   display: inline-flex; align-items: center; gap: 3px;
   font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 100px;
@@ -477,6 +535,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
       <span class="logo">베이비 플레이스 아카이브</span>
     </div>
     <div class="header-actions">
+      <button class="btn btn-ghost" onclick="forceSyncAll()" style="font-size:12px;padding:7px 14px">☁️ 시트 동기화</button>
       <button class="btn btn-ghost" onclick="openHomeModal()">🏠 집주소</button>
       <button class="btn btn-primary" onclick="openAddModal()">＋ 장소 추가</button>
     </div>
@@ -504,8 +563,14 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
       <button class="badge"        onclick="setSort('month')" id="sort-month">개월수순</button>
       <button class="badge"        onclick="setSort('dist')"  id="sort-dist">거리순</button>
     </div>
-    <div id="toolbarRight">
-      <button class="btn btn-ghost" id="editBtn" onclick="enterEditMode()" style="font-size:12px;padding:7px 16px">편집</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="view-toggle">
+        <button class="view-btn active" id="view-grid" title="갤러리">⊞</button>
+        <button class="view-btn"        id="view-list" title="리스트">☰</button>
+      </div>
+      <div id="toolbarRight">
+        <button class="btn btn-ghost" id="editBtn" onclick="enterEditMode()" style="font-size:12px;padding:7px 16px">편집</button>
+      </div>
     </div>
   </div>
 
@@ -656,6 +721,7 @@ let places      = JSON.parse(localStorage.getItem('baby-places') || '[]');
 let homeAddress = localStorage.getItem('baby-home') || '';
 let homeDetail  = localStorage.getItem('baby-home-detail') || '';
 let sortMode    = 'date';
+let viewMode    = 'grid'; // 'grid' | 'list'
 let editingId   = null;
 let currentImg  = null;
 let editMode    = false;
@@ -756,19 +822,20 @@ function render() {
     return;
   }
   gallery.innerHTML = list.map(cardHTML).join('');
+  gallery.classList.toggle('list-view', viewMode === 'list');
   updateEditBtn();
 }
 
 function cardHTML(p) {
   // 사진 없을 때 장소명 첫 글자 + 고유 그라디언트
   const gradients = [
-    'linear-gradient(135deg, #F2C4A8 0%, #E8957A 100%)',
-    'linear-gradient(135deg, #B8D4B8 0%, #7BA872 100%)',
-    'linear-gradient(135deg, #C4D4E8 0%, #7A95C9 100%)',
-    'linear-gradient(135deg, #E8D4B8 0%, #C9A87A 100%)',
-    'linear-gradient(135deg, #D4B8E8 0%, #A87AC9 100%)',
-    'linear-gradient(135deg, #B8E8D4 0%, #7AC9A8 100%)',
-    'linear-gradient(135deg, #E8B8C4 0%, #C97A8A 100%)',
+    'linear-gradient(145deg, #FFB5A0 0%, #E8607A 100%)',
+    'linear-gradient(145deg, #A8D8B0 0%, #4BA86C 100%)',
+    'linear-gradient(145deg, #A8C8F0 0%, #5078C8 100%)',
+    'linear-gradient(145deg, #FFD4A0 0%, #E89040 100%)',
+    'linear-gradient(145deg, #C8A8E8 0%, #8048C0 100%)',
+    'linear-gradient(145deg, #A8E8D8 0%, #30A890 100%)',
+    'linear-gradient(145deg, #F0C0D8 0%, #C05888 100%)',
   ];
   const grad = gradients[p.id % gradients.length];
   const initial = p.name ? p.name.charAt(0) : '📍';
@@ -797,11 +864,12 @@ function cardHTML(p) {
     <div class="card-img-wrap">${img}</div>
     <div class="card-body">
       <div class="card-name">${p.name}</div>
-      ${r1 ? `<div class="card-tags-row">${r1}</div>` : ''}
-      ${r2 ? `<div class="card-tags-row">${r2}</div>` : ''}
+      <div class="card-tags-row">${r1}</div>
+      <div class="card-tags-row">${r2}</div>
       ${p.feature ? `<div class="card-feature">${p.feature}</div>` : ''}
+      <div class="card-date-inline">${formatDate(p.id)}</div>
     </div>
-    <div class="card-date">${formatDate(p.id)}</div>
+    <div class="card-date card-date-block">${formatDate(p.id)}</div>
     <div class="card-footer">
       <button class="visit-btn${p.visited ? ' checked' : ''}" onclick="toggleVisit(event,${p.id})">
         <div class="checkmark">${p.visited ? '✓' : ''}</div>
@@ -920,6 +988,16 @@ function setSort(mode) {
   sortMode = mode;
   document.querySelectorAll('.badge').forEach(b => b.classList.remove('active'));
   document.getElementById('sort-' + mode).classList.add('active');
+  render();
+}
+
+// ─── VIEW MODE ────────────────────────────────────────────────────────
+function setView(mode) {
+  viewMode = mode;
+  const gridBtn = document.getElementById('view-grid');
+  const listBtn = document.getElementById('view-list');
+  if (gridBtn) gridBtn.classList.toggle('active', mode === 'grid');
+  if (listBtn) listBtn.classList.toggle('active', mode === 'list');
   render();
 }
 
@@ -1116,6 +1194,22 @@ function saveHome() {
 // ─── GOOGLE SHEETS 연동 ───────────────────────────────────────────────
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzqQ12YBi58MIa9J9wJIe4joQFgM8muppLO9XvL1aMQXclgXh-wU80nKOzYHw_tMswsOg/exec';
 
+async function forceSyncAll() {
+  if (places.length === 0) { showToast('저장된 장소가 없어요', 'info'); return; }
+  showToast('☁️ 시트에 동기화 중...', 'info');
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'save', places })
+    });
+    showToast(`✅ ${places.length}개 장소를 시트에 저장했어요`, 'success');
+  } catch(e) {
+    showToast('⚠️ 동기화 실패. 다시 시도해주세요', 'error');
+  }
+}
+
 async function syncToSheet() {
   try {
     await fetch(APPS_SCRIPT_URL, {
@@ -1168,6 +1262,8 @@ function closeModal(id) {
 function closeOnOverlay(e, id) { if (e.target.id === id) closeModal(id); }
 
 // ─── INIT ──────────────────────────────────────────────────────────────
+document.getElementById('view-grid').addEventListener('click', () => setView('grid'));
+document.getElementById('view-list').addEventListener('click', () => setView('list'));
 render();
 loadFromSheet();
 </script>
