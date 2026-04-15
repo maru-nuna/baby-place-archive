@@ -275,22 +275,20 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
 }
 .card-img-placeholder::before {
   content: ''; position: absolute; inset: 0;
-  background: rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.15);
 }
 .card-img-placeholder .ph-initial {
   font-family: 'Fraunces', serif;
   font-size: 52px; font-weight: 600; line-height: 1;
   color: rgba(255,255,255,0.95);
-  text-shadow: 0 2px 16px rgba(0,0,0,0.2);
-  letter-spacing: -1px;
-  z-index: 1;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  letter-spacing: -1px; z-index: 1;
 }
 .card-img-placeholder .ph-label {
   font-size: 11px; font-weight: 600;
   color: rgba(255,255,255,0.9);
-  background: rgba(0,0,0,0.18);
-  padding: 3px 10px; border-radius: 100px;
-  z-index: 1;
+  background: rgba(0,0,0,0.12);
+  padding: 3px 10px; border-radius: 100px; z-index: 1;
   max-width: 85%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   letter-spacing: 0.2px;
 }
@@ -829,13 +827,13 @@ function render() {
 function cardHTML(p) {
   // 사진 없을 때 장소명 첫 글자 + 고유 그라디언트
   const gradients = [
-    'linear-gradient(145deg, #FFB5A0 0%, #E8607A 100%)',
-    'linear-gradient(145deg, #A8D8B0 0%, #4BA86C 100%)',
-    'linear-gradient(145deg, #A8C8F0 0%, #5078C8 100%)',
-    'linear-gradient(145deg, #FFD4A0 0%, #E89040 100%)',
-    'linear-gradient(145deg, #C8A8E8 0%, #8048C0 100%)',
-    'linear-gradient(145deg, #A8E8D8 0%, #30A890 100%)',
-    'linear-gradient(145deg, #F0C0D8 0%, #C05888 100%)',
+    'linear-gradient(135deg, #FFB3BA 0%, #FFD4A8 100%)',
+    'linear-gradient(135deg, #FFD4A8 0%, #FFF4A8 100%)',
+    'linear-gradient(135deg, #B8F0C8 0%, #A8E8F0 100%)',
+    'linear-gradient(135deg, #A8D8F8 0%, #C8B8F8 100%)',
+    'linear-gradient(135deg, #F8B8E8 0%, #FFB3BA 100%)',
+    'linear-gradient(135deg, #C8F8B8 0%, #FFD4A8 100%)',
+    'linear-gradient(135deg, #D4B8F8 0%, #A8D8F8 100%)',
   ];
   const grad = gradients[p.id % gradients.length];
   const initial = p.name ? p.name.charAt(0) : '📍';
