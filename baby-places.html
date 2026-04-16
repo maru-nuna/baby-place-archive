@@ -495,7 +495,50 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
   .gallery { grid-template-columns: 1fr; }
 }
 
-/* ── TOAST ───────────────────────────────────────────────────────── */
+/* ── TAB BAR ─────────────────────────────────────────────────────── */
+.tab-bar { border-top: 1px solid var(--border); background: rgba(250,247,244,0.92); }
+.tab-inner { max-width: 1040px; margin: 0 auto; padding: 0 28px; display: flex; gap: 0; }
+.tab-btn {
+  padding: 11px 24px; font-size: 14px; font-weight: 500;
+  font-family: 'Pretendard', sans-serif; color: var(--text-muted);
+  background: none; border: none; cursor: pointer;
+  border-bottom: 2.5px solid transparent; margin-bottom: -1px;
+  transition: all 0.16s;
+}
+.tab-btn:hover { color: var(--text-sub); }
+.tab-btn.active { color: var(--rose); border-bottom-color: var(--rose); font-weight: 600; }
+
+/* ── ITEM CARD ───────────────────────────────────────────────────── */
+.item-card-price {
+  font-size: 15px; font-weight: 700; color: var(--rose);
+  margin-bottom: 6px; letter-spacing: -0.3px;
+}
+.item-card-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; color: var(--text-muted); text-decoration: none;
+  background: var(--cream); padding: 3px 8px; border-radius: 100px;
+  border: 1px solid var(--border); transition: all 0.15s; margin-top: 4px;
+}
+.item-card-link:hover { color: var(--rose); border-color: var(--rose); background: var(--rose-light); }
+.item-card-bought { opacity: 0.55; }
+.item-card-bought .card-img-wrap::after {
+  content: '✓ 구매완료';
+  position: absolute; inset: 0;
+  background: rgba(139,191,140,0.62);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 13px; font-weight: 700;
+}
+
+/* 가격 비교 배지 */
+.price-badge {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 600; padding: 3px 8px;
+  border-radius: 100px; margin: 4px 0 2px;
+}
+.price-badge.cheaper { background: rgba(139,191,140,0.15); color: #4A8F4A; }
+.price-badge.pricier  { background: rgba(217,80,80,0.1);   color: var(--danger); }
+.price-badge.same     { background: var(--cream); color: var(--text-muted); }
+.price-badge.loading  { background: var(--cream); color: var(--text-muted); font-weight: 400; }
 .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(12px);
   background: var(--text); color: #fff;
   padding: 11px 20px; border-radius: 100px;
@@ -530,50 +573,88 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
 <header>
   <div class="header-inner">
     <div>
-      <span class="logo">베이비 플레이스 아카이브</span>
+      <span class="logo">도영이를 위한 아카이브</span>
     </div>
     <div class="header-actions">
-      <button class="btn btn-ghost" onclick="forceSyncAll()" style="font-size:12px;padding:7px 14px">☁️ 시트 동기화</button>
       <button class="btn btn-ghost" onclick="openHomeModal()">🏠 집주소</button>
-      <button class="btn btn-primary" onclick="openAddModal()">＋ 장소 추가</button>
+      <button class="btn btn-primary" id="addBtn" onclick="onAddClick()">＋ 추가</button>
+    </div>
+  </div>
+  <!-- TAB -->
+  <div class="tab-bar">
+    <div class="tab-inner">
+      <button class="tab-btn active" id="tab-place" onclick="switchTab('place')">📍 장소</button>
+      <button class="tab-btn"        id="tab-item"  onclick="switchTab('item')">🛍 물건</button>
     </div>
   </div>
 </header>
 
 <main>
-  <!-- BANNER -->
-  <div class="banner">
-    <div class="banner-title">도영이랑 어디갈까? 🌿</div>
-    <div class="banner-sub">우리 가족이 놀러갈 곳들을 모아보자!</div>
-    <div class="banner-meta">
-      <div class="banner-addr" onclick="openHomeModal()">
-        <span>🏠</span><span id="homeAddrText">집주소를 설정해주세요</span>
+  <!-- ══ PLACE PAGE ══ -->
+  <div id="page-place">
+    <!-- BANNER -->
+    <div class="banner">
+      <div class="banner-title">도영이랑 어디갈까? 🌿</div>
+      <div class="banner-sub">우리 가족이 놀러갈 곳들을 모아보자!</div>
+      <div class="banner-meta">
+        <div class="banner-addr" onclick="openHomeModal()">
+          <span>🏠</span><span id="homeAddrText">집주소를 설정해주세요</span>
+        </div>
+        <span class="banner-count" id="totalCount"></span>
       </div>
-      <span class="banner-count" id="totalCount"></span>
     </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="sort-group">
+        <span class="sort-label">정렬</span>
+        <button class="badge active" onclick="setSort('date')"  id="sort-date">등록순</button>
+        <button class="badge"        onclick="setSort('month')" id="sort-month">개월수순</button>
+        <button class="badge"        onclick="setSort('dist')"  id="sort-dist">거리순</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="view-toggle">
+          <button class="view-btn active" id="view-grid" title="갤러리">⊞</button>
+          <button class="view-btn"        id="view-list" title="리스트">☰</button>
+        </div>
+        <div id="toolbarRight">
+          <button class="btn btn-ghost" id="editBtn" onclick="enterEditMode()" style="font-size:12px;padding:7px 16px">편집</button>
+        </div>
+      </div>
+    </div>
+    <div class="gallery" id="gallery"></div>
   </div>
 
-  <!-- TOOLBAR -->
-  <div class="toolbar">
-    <div class="sort-group">
-      <span class="sort-label">정렬</span>
-      <button class="badge active" onclick="setSort('date')"  id="sort-date">등록순</button>
-      <button class="badge"        onclick="setSort('month')" id="sort-month">개월수순</button>
-      <button class="badge"        onclick="setSort('dist')"  id="sort-dist">거리순</button>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <div class="view-toggle">
-        <button class="view-btn active" id="view-grid" title="갤러리">⊞</button>
-        <button class="view-btn"        id="view-list" title="리스트">☰</button>
-      </div>
-      <div id="toolbarRight">
-        <button class="btn btn-ghost" id="editBtn" onclick="enterEditMode()" style="font-size:12px;padding:7px 16px">편집</button>
+  <!-- ══ ITEM PAGE ══ -->
+  <div id="page-item" style="display:none">
+    <div class="banner" style="background:linear-gradient(130deg,#D4E8FF 0%,#E8D4FF 60%,#FFD4F0 100%)">
+      <div class="banner-title" style="color:#5060C0">도영이를 위한 물건 🛍</div>
+      <div class="banner-sub">사고 싶은 것들을 모아두자!</div>
+      <div class="banner-meta">
+        <div class="banner-addr" style="cursor:default;color:#5060C0">
+          <span>🛍</span><span id="itemSummary">총 0개 · 총 0원</span>
+        </div>
+        <span class="banner-count" id="itemCount"></span>
       </div>
     </div>
+    <div class="toolbar">
+      <div class="sort-group">
+        <span class="sort-label">정렬</span>
+        <button class="badge active" onclick="setItemSort('date')"  id="isort-date">등록순</button>
+        <button class="badge"        onclick="setItemSort('price')" id="isort-price">가격순</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="view-toggle">
+          <button class="view-btn active" id="iview-grid" title="갤러리">⊞</button>
+          <button class="view-btn"        id="iview-list" title="리스트">☰</button>
+        </div>
+        <div id="itemToolbarRight">
+          <button class="btn btn-ghost" id="itemEditBtn" onclick="enterItemEditMode()" style="font-size:12px;padding:7px 16px">편집</button>
+        </div>
+      </div>
+    </div>
+    <div class="gallery" id="itemGallery"></div>
   </div>
-
-  <!-- GALLERY -->
-  <div class="gallery" id="gallery"></div>
 </main>
 
 <!-- ══ ADD / EDIT MODAL ══ -->
@@ -706,6 +787,85 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
       <button class="btn btn-ghost" onclick="closeModal('cancelOverlay')">계속 작성</button>
       <button class="btn btn-primary" onclick="forceCancel()">닫기</button>
     </div>
+  </div>
+</div>
+
+<!-- ══ ITEM ADD / EDIT MODAL ══ -->
+<div class="overlay" id="itemAddOverlay">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="itemModalTitle">물건 추가</span>
+      <button class="modal-close" onclick="tryItemCancel()">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">상품명 <span class="req">*</span></label>
+      <input class="form-input" id="iinp-name" placeholder="예: 무민 턱받이" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">가격 <span class="req">*</span></label>
+        <input class="form-input" id="iinp-price" type="number" placeholder="예: 15000" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">구매 링크 <span class="req">*</span></label>
+        <input class="form-input" id="iinp-link" placeholder="https://..." />
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">특이사항 <span style="color:var(--text-muted);font-weight:400">(선택)</span></label>
+      <textarea class="form-textarea" id="iinp-note" placeholder="예: 사이즈 70, 색상 민트"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">사진 <span style="color:var(--text-muted);font-weight:400">(선택)</span></label>
+      <div class="img-upload-wrap" onclick="document.getElementById('iImgInput').click()">
+        📷 사진 추가
+        <input type="file" id="iImgInput" accept="image/*" style="display:none" onchange="handleItemImg(event)">
+      </div>
+      <img id="iImgPreview" class="img-preview-img" style="display:none" />
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="tryItemCancel()">취소</button>
+      <button class="btn btn-primary" onclick="saveItem()">저장하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ITEM DELETE CONFIRM ══ -->
+<div class="overlay" id="itemDeleteOverlay">
+  <div class="modal confirm-modal">
+    <div class="modal-title">
+      <span>🗑 물건 삭제</span>
+      <button class="modal-close" onclick="closeModal('itemDeleteOverlay')">✕</button>
+    </div>
+    <p class="confirm-msg" id="itemDeleteMsg">선택한 물건을 삭제할까요?<br>삭제 후에는 되돌릴 수 없어요.</p>
+    <p class="confirm-name" id="itemDeleteName"></p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('itemDeleteOverlay')">취소</button>
+      <button class="btn btn-danger" onclick="confirmItemDelete()">삭제하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ITEM CANCEL GUARD ══ -->
+<div class="overlay" id="itemCancelOverlay">
+  <div class="modal mini-modal">
+    <div class="modal-title"><span>✋ 작성을 중단할까요?</span></div>
+    <div class="modal-body">입력 중인 내용이 있어요.<br>취소하면 내용이 모두 사라져요.</div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('itemCancelOverlay')">계속 작성</button>
+      <button class="btn btn-primary" onclick="forceItemCancel()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ITEM DETAIL MODAL ══ -->
+<div class="overlay" id="itemDetailOverlay" onclick="closeOnOverlay(event,'itemDetailOverlay')">
+  <div class="modal">
+    <div class="modal-title">
+      <span>물건 상세</span>
+      <button class="modal-close" onclick="closeModal('itemDetailOverlay')">✕</button>
+    </div>
+    <div id="itemDetailBody"></div>
   </div>
 </div>
 
@@ -1190,7 +1350,7 @@ function saveHome() {
 }
 
 // ─── GOOGLE SHEETS 연동 ───────────────────────────────────────────────
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzfAO61z1twa2AbrzpWfeE17aQfKOSOUIHbaqY7T9xDCt2G2oA6H6ksrRZr62_c3c2Dww/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0MFW_N2nhW9O323mNkhwo_gHRJpVkrHbmOrwYTQOto28IRWCs7Q3owrhK8GmDTh00LQ/exec';
 
 async function forceSyncAll() {
   if (places.length === 0) { showToast('저장된 장소가 없어요', 'info'); return; }
@@ -1211,14 +1371,21 @@ async function forceSyncAll() {
 async function syncToSheet() {
   try {
     await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      mode: 'no-cors',
+      method: 'POST', mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'save', places })
     });
-  } catch(e) {
-    console.warn('시트 동기화 실패:', e);
-  }
+  } catch(e) { console.warn('장소 시트 동기화 실패:', e); }
+}
+
+async function syncItemsToSheet() {
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: 'POST', mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'saveItems', items })
+    });
+  } catch(e) { console.warn('물건 시트 동기화 실패:', e); }
 }
 
 async function loadFromSheet(showFeedback = false) {
@@ -1228,8 +1395,7 @@ async function loadFromSheet(showFeedback = false) {
     const data = await res.json();
     if (data.result === 'success' && data.places.length > 0) {
       places = data.places.map(p => ({
-        ...p,
-        id:      Number(p.id),
+        ...p, id: Number(p.id),
         visited: p.visited === true || p.visited === 'TRUE',
         feats:   Array.isArray(p.feats) ? p.feats : (p.feats ? p.feats.split('|') : []),
         img:     p.img || null,
@@ -1243,9 +1409,416 @@ async function loadFromSheet(showFeedback = false) {
   }
 }
 
+async function loadItemsFromSheet() {
+  try {
+    const res = await fetch(APPS_SCRIPT_URL + '?action=getItems&t=' + Date.now());
+    const data = await res.json();
+    if (data.result === 'success' && data.items.length > 0) {
+      items = data.items.map(i => ({
+        ...i, id: Number(i.id),
+        price:  Number(i.price),
+        bought: i.bought === true || i.bought === 'TRUE',
+        img:    i.img || null,
+      }));
+      localStorage.setItem('baby-items', JSON.stringify(items));
+      if (currentTab === 'item') renderItems();
+    }
+  } catch(e) { console.warn('물건 불러오기 실패:', e); }
+}
+
+// 가격 크롤링
+const priceCache = {};
+async function fetchLivePrice(itemId, url) {
+  if (!url) return;
+  if (priceCache[itemId] !== undefined) return; // 이미 조회함
+  priceCache[itemId] = null; // 조회 중 표시
+  try {
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=fetchPrice&url=${encodeURIComponent(url)}&t=${Date.now()}`);
+    const data = await res.json();
+    if (data.result === 'success' && data.price) {
+      priceCache[itemId] = data.price;
+      updatePriceBadge(itemId);
+    }
+  } catch(e) { console.warn('가격 조회 실패:', e); }
+}
+
+function updatePriceBadge(itemId) {
+  const it = items.find(x => x.id === itemId);
+  if (!it) return;
+  const livePrice = priceCache[itemId];
+  if (livePrice == null) return;
+
+  const diff = livePrice - Number(it.price);
+  const pct  = Math.abs(Math.round(diff / Number(it.price) * 100));
+  let badge = '';
+  if (diff < 0) {
+    badge = `<div class="price-badge cheaper">📉 지금이 ${Math.abs(diff).toLocaleString()}원 (${pct}%) 싸요!</div>`;
+  } else if (diff > 0) {
+    badge = `<div class="price-badge pricier">📈 ${diff.toLocaleString()}원 (${pct}%) 올랐어요</div>`;
+  } else {
+    badge = `<div class="price-badge same">가격 변동 없어요</div>`;
+  }
+
+  // 카드 + 상세 모달에 반영
+  const el = document.querySelector(`[data-price-id="${itemId}"]`);
+  if (el) el.innerHTML = badge;
+}
+
 function save() {
   localStorage.setItem('baby-places', JSON.stringify(places));
   syncToSheet();
+}
+
+// ─── TAB ──────────────────────────────────────────────────────────────
+let currentTab = 'place';
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('page-place').style.display = tab === 'place' ? '' : 'none';
+  document.getElementById('page-item').style.display  = tab === 'item'  ? '' : 'none';
+  document.getElementById('tab-place').classList.toggle('active', tab === 'place');
+  document.getElementById('tab-item').classList.toggle('active',  tab === 'item');
+  const addBtn = document.getElementById('addBtn');
+  addBtn.textContent = tab === 'place' ? '＋ 장소 추가' : '＋ 물건 추가';
+  if (tab === 'item') renderItems();
+}
+
+function onAddClick() {
+  if (currentTab === 'place') openAddModal();
+  else openItemAddModal();
+}
+
+// ─── ITEMS STATE ──────────────────────────────────────────────────────
+let items         = JSON.parse(localStorage.getItem('baby-items') || '[]');
+let itemSortMode  = 'date';
+let itemViewMode  = 'grid';
+let itemEditMode  = false;
+let itemSelectedIds = new Set();
+let editingItemId = null;
+let currentItemImg = null;
+let itemOriginalSnapshot = null;
+let pendingItemDeleteId = null;
+
+function saveItems() {
+  localStorage.setItem('baby-items', JSON.stringify(items));
+  syncItemsToSheet();
+}
+
+function formatPrice(n) {
+  return Number(n).toLocaleString('ko-KR') + '원';
+}
+
+// ─── ITEM RENDER ──────────────────────────────────────────────────────
+function renderItems() {
+  const total = items.length;
+  const bought = items.filter(i => i.bought).length;
+  const totalPrice = items.reduce((sum, i) => sum + Number(i.price || 0), 0);
+  document.getElementById('itemSummary').textContent =
+    `총 ${total}개 · 총 ${totalPrice.toLocaleString('ko-KR')}원`;
+  document.getElementById('itemCount').textContent =
+    total ? `구매완료 ${bought}개` : '';
+
+  const notBought = items.filter(i => !i.bought);
+  const boughtList = items.filter(i => i.bought);
+
+  function sortFn(arr) {
+    if (itemSortMode === 'price')
+      return [...arr].sort((a,b) => Number(a.price) - Number(b.price));
+    return [...arr].sort((a,b) => a.id - b.id);
+  }
+
+  const list = [...sortFn(notBought), ...sortFn(boughtList)];
+  const gallery = document.getElementById('itemGallery');
+
+  if (!list.length) {
+    gallery.innerHTML = `<div class="empty-state"><div class="emoji">🛍</div><p>아직 저장된 물건이 없어요.<br>+ 물건 추가 버튼으로 첫 번째 물건을 등록해보세요!</p></div>`;
+    updateItemEditBtn();
+    return;
+  }
+  gallery.innerHTML = list.map(itemCardHTML).join('');
+  gallery.classList.toggle('list-view', itemViewMode === 'list');
+  updateItemEditBtn();
+  // 가격 조회 (링크 있는 항목만)
+  items.filter(i => i.link).forEach(i => fetchLivePrice(i.id, i.link));
+}
+
+function itemCardHTML(it) {
+  const gradients = [
+    'linear-gradient(135deg,#D4E8FF 0%,#A8C8F8 100%)',
+    'linear-gradient(135deg,#FFD4F0 0%,#F8A8D4 100%)',
+    'linear-gradient(135deg,#D4FFE8 0%,#A8F8C8 100%)',
+    'linear-gradient(135deg,#FFF4A8 0%,#F8D878 100%)',
+    'linear-gradient(135deg,#E8D4FF 0%,#C8A8F8 100%)',
+    'linear-gradient(135deg,#FFE8D4 0%,#F8C8A8 100%)',
+    'linear-gradient(135deg,#D4F8FF 0%,#A8E8F8 100%)',
+  ];
+  const grad = gradients[it.id % gradients.length];
+  const initial = it.name ? it.name.charAt(0) : '🛍';
+  const imgHTML = it.img
+    ? `<img src="${it.img}" alt="${it.name}" style="width:100%;height:100%;object-fit:cover">`
+    : `<div class="card-img-placeholder" style="background:${grad}">
+        <div class="ph-initial">${initial}</div>
+        <div class="ph-label">${it.name}</div>
+      </div>`;
+  const sel = itemSelectedIds.has(it.id);
+
+  return `
+  <div class="card${it.bought ? ' item-card-bought' : ''}${sel ? ' edit-selected' : ''}"
+       onclick="onItemCardClick(event,${it.id})" data-id="${it.id}">
+    <div class="card-select-overlay"></div>
+    <div class="card-img-wrap">${imgHTML}</div>
+    <div class="card-body">
+      <div class="card-name">${it.name}</div>
+      <div class="item-card-price">${formatPrice(it.price)}</div>
+      <div data-price-id="${it.id}">${priceCache[it.id] != null ? getPriceBadgeHTML(it) : '<div class="price-badge loading">가격 확인 중...</div>'}</div>
+      ${it.note ? `<div class="card-feature">${it.note}</div>` : ''}
+      ${it.link ? `<a class="item-card-link" href="${it.link}" target="_blank" onclick="event.stopPropagation()">🔗 구매링크</a>` : ''}
+      <div class="card-date-inline">${formatDate(it.id)}</div>
+    </div>
+    <div class="card-date card-date-block">${formatDate(it.id)}</div>
+    <div class="card-footer">
+      <button class="visit-btn${it.bought ? ' checked' : ''}" onclick="toggleBought(event,${it.id})">
+        <div class="checkmark">${it.bought ? '✓' : ''}</div>
+        구매완료!
+      </button>
+      <div class="card-edit-actions">
+        <button class="edit-icon-btn" onclick="openItemEdit(event,${it.id})" title="수정">✏️</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function getPriceBadgeHTML(it) {
+  const livePrice = priceCache[it.id];
+  if (livePrice == null) return '';
+  const diff = livePrice - Number(it.price);
+  const pct  = Math.abs(Math.round(diff / Number(it.price) * 100));
+  if (diff < 0) return `<div class="price-badge cheaper">📉 지금이 ${Math.abs(diff).toLocaleString()}원 (${pct}%) 싸요!</div>`;
+  if (diff > 0) return `<div class="price-badge pricier">📈 ${diff.toLocaleString()}원 (${pct}%) 올랐어요</div>`;
+  return `<div class="price-badge same">가격 변동 없어요</div>`;
+}
+
+function toggleBought(e, id) {
+  e.stopPropagation();
+  const it = items.find(x => x.id === id);
+  if (it) { it.bought = !it.bought; saveItems(); renderItems(); }
+}
+
+// ─── ITEM SORT / VIEW ─────────────────────────────────────────────────
+function setItemSort(mode) {
+  itemSortMode = mode;
+  document.querySelectorAll('#page-item .badge').forEach(b => b.classList.remove('active'));
+  document.getElementById('isort-' + mode).classList.add('active');
+  renderItems();
+}
+
+function setItemView(mode) {
+  itemViewMode = mode;
+  const g = document.getElementById('iview-grid');
+  const l = document.getElementById('iview-list');
+  if (g) g.classList.toggle('active', mode === 'grid');
+  if (l) l.classList.toggle('active', mode === 'list');
+  renderItems();
+}
+
+// ─── ITEM EDIT MODE ───────────────────────────────────────────────────
+function enterItemEditMode() {
+  itemEditMode = true; itemSelectedIds.clear();
+  document.getElementById('itemGallery').classList.add('edit-mode');
+  renderItemEditBar();
+  renderItems();
+}
+
+function renderItemEditBar() {
+  const allCount = items.length;
+  const isAll = itemSelectedIds.size > 0 && itemSelectedIds.size === allCount;
+  document.getElementById('itemToolbarRight').innerHTML = `
+    <div class="edit-bar">
+      <button class="edit-bar-selall" onclick="toggleItemSelectAll()">${isAll ? '전체 해제' : '전체 선택'}</button>
+      <span class="edit-bar-sep">|</span>
+      <span class="edit-bar-label">선택됨</span>
+      <span class="edit-bar-count">${itemSelectedIds.size}</span>
+      <button class="edit-bar-del" onclick="askItemBulkDelete()" ${itemSelectedIds.size === 0 ? 'disabled' : ''}>삭제</button>
+      <button class="edit-bar-cancel" onclick="exitItemEditMode()">완료</button>
+    </div>`;
+}
+
+function exitItemEditMode() {
+  itemEditMode = false; itemSelectedIds.clear();
+  document.getElementById('itemGallery').classList.remove('edit-mode');
+  document.getElementById('itemToolbarRight').innerHTML =
+    `<button class="btn btn-ghost" id="itemEditBtn" onclick="enterItemEditMode()" style="font-size:12px;padding:7px 16px">편집</button>`;
+  updateItemEditBtn();
+  renderItems();
+}
+
+function updateItemEditBtn() {
+  const btn = document.getElementById('itemEditBtn');
+  if (!btn) return;
+  btn.disabled = items.length === 0;
+  btn.style.opacity = items.length === 0 ? '0.38' : '';
+  btn.style.pointerEvents = items.length === 0 ? 'none' : '';
+}
+
+function toggleItemSelectAll() {
+  const allIds = items.map(i => i.id);
+  const isAll = itemSelectedIds.size === allIds.length && allIds.length > 0;
+  if (isAll) itemSelectedIds.clear();
+  else allIds.forEach(id => itemSelectedIds.add(id));
+  renderItemEditBar();
+  renderItems();
+}
+
+function onItemCardClick(e, id) {
+  if (itemEditMode) {
+    e.stopPropagation();
+    if (itemSelectedIds.has(id)) itemSelectedIds.delete(id);
+    else itemSelectedIds.add(id);
+    renderItemEditBar();
+    const card = document.querySelector(`#itemGallery .card[data-id="${id}"]`);
+    if (card) card.classList.toggle('edit-selected', itemSelectedIds.has(id));
+    return;
+  }
+  openItemDetail(id);
+}
+
+function askItemBulkDelete() {
+  if (itemSelectedIds.size === 0) return;
+  document.getElementById('itemDeleteMsg').innerHTML = `선택한 물건 <strong>${itemSelectedIds.size}개</strong>를 삭제할까요?`;
+  document.getElementById('itemDeleteName').textContent = '';
+  openModal('itemDeleteOverlay');
+}
+
+function confirmItemDelete() {
+  if (pendingItemDeleteId) {
+    items = items.filter(x => x.id !== pendingItemDeleteId);
+    pendingItemDeleteId = null;
+  } else {
+    items = items.filter(i => !itemSelectedIds.has(i.id));
+    itemSelectedIds.clear();
+  }
+  saveItems(); renderItems();
+  closeModal('itemDeleteOverlay');
+  if (itemEditMode) renderItemEditBar();
+}
+
+// ─── ITEM DETAIL ──────────────────────────────────────────────────────
+function openItemDetail(id) {
+  const it = items.find(x => x.id === id);
+  if (!it) return;
+  const imgHTML = it.img
+    ? `<img class="detail-img" src="${it.img}" alt="${it.name}">`
+    : `<div class="detail-no-img">🛍</div>`;
+  document.getElementById('itemDetailBody').innerHTML = `
+    ${imgHTML}
+    <div class="detail-name">${it.name}</div>
+    <div class="item-card-price" style="font-size:18px;margin-bottom:12px">${formatPrice(it.price)}</div>
+    ${it.link ? `<a class="item-card-link" href="${it.link}" target="_blank" style="font-size:13px;padding:6px 14px;margin-bottom:12px;display:inline-flex">🔗 구매링크 바로가기</a>` : ''}
+    ${it.note ? `<div class="detail-feature" style="margin-top:10px">${it.note}</div>` : ''}
+    <div class="detail-date">${formatDate(it.id)}</div>
+    <div style="margin-top:20px;display:flex;gap:8px;justify-content:flex-end">
+      <button class="btn btn-ghost" onclick="closeModal('itemDetailOverlay');openItemEdit(null,${it.id})">수정</button>
+      <button class="btn btn-sage" onclick="toggleBought(new Event('c'),${it.id});closeModal('itemDetailOverlay')">
+        ${it.bought ? '미구매로 변경' : '✓ 구매완료!'}
+      </button>
+    </div>`;
+  openModal('itemDetailOverlay');
+}
+
+// ─── ITEM ADD / EDIT ──────────────────────────────────────────────────
+function resetItemForm() {
+  document.getElementById('iinp-name').value = '';
+  document.getElementById('iinp-price').value = '';
+  document.getElementById('iinp-link').value = '';
+  document.getElementById('iinp-note').value = '';
+  document.getElementById('iImgInput').value = '';
+  document.getElementById('iImgPreview').style.display = 'none';
+  document.getElementById('iImgPreview').src = '';
+  document.querySelectorAll('#itemAddOverlay .input-error').forEach(el => el.classList.remove('input-error'));
+  currentItemImg = null;
+}
+
+function getItemSnapshot() {
+  return JSON.stringify({
+    name:  document.getElementById('iinp-name').value,
+    price: document.getElementById('iinp-price').value,
+    link:  document.getElementById('iinp-link').value,
+    note:  document.getElementById('iinp-note').value,
+    img:   currentItemImg
+  });
+}
+
+function openItemAddModal() {
+  editingItemId = null;
+  resetItemForm();
+  document.getElementById('itemModalTitle').textContent = '물건 추가';
+  itemOriginalSnapshot = getItemSnapshot();
+  openModal('itemAddOverlay');
+}
+
+function openItemEdit(e, id) {
+  if (e) e.stopPropagation();
+  const it = items.find(x => x.id === id);
+  if (!it) return;
+  editingItemId = id;
+  resetItemForm();
+  document.getElementById('iinp-name').value  = it.name;
+  document.getElementById('iinp-price').value = it.price;
+  document.getElementById('iinp-link').value  = it.link || '';
+  document.getElementById('iinp-note').value  = it.note || '';
+  currentItemImg = it.img || null;
+  if (it.img) { document.getElementById('iImgPreview').src = it.img; document.getElementById('iImgPreview').style.display = 'block'; }
+  document.getElementById('itemModalTitle').textContent = '물건 수정';
+  itemOriginalSnapshot = getItemSnapshot();
+  openModal('itemAddOverlay');
+}
+
+function handleItemImg(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    currentItemImg = ev.target.result;
+    document.getElementById('iImgPreview').src = currentItemImg;
+    document.getElementById('iImgPreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function tryItemCancel() {
+  if (getItemSnapshot() !== itemOriginalSnapshot) { openModal('itemCancelOverlay'); return; }
+  closeModal('itemAddOverlay');
+}
+function forceItemCancel() { closeModal('itemCancelOverlay'); closeModal('itemAddOverlay'); }
+
+function saveItem() {
+  const name  = document.getElementById('iinp-name').value.trim();
+  const price = document.getElementById('iinp-price').value;
+  const link  = document.getElementById('iinp-link').value.trim();
+  const note  = document.getElementById('iinp-note').value.trim();
+
+  const invalidFields = [];
+  if (!name)  invalidFields.push(document.getElementById('iinp-name'));
+  if (!price) invalidFields.push(document.getElementById('iinp-price'));
+  if (!link)  invalidFields.push(document.getElementById('iinp-link'));
+
+  if (invalidFields.length) {
+    showToast('⚠️ 필수 항목을 모두 입력해주세요');
+    invalidFields.forEach(el => {
+      el.classList.add('input-error');
+      el.addEventListener('input', () => el.classList.remove('input-error'), { once: true });
+    });
+    invalidFields[0].focus();
+    return;
+  }
+
+  if (editingItemId !== null) {
+    const it = items.find(x => x.id === editingItemId);
+    if (it) Object.assign(it, { name, price: Number(price), link, note, img: currentItemImg });
+  } else {
+    items.push({ id: Date.now(), name, price: Number(price), link, note, img: currentItemImg, bought: false });
+  }
+  saveItems(); renderItems();
+  closeModal('itemAddOverlay');
 }
 
 // ─── MODAL HELPERS ─────────────────────────────────────────────────────
@@ -1262,8 +1835,11 @@ function closeOnOverlay(e, id) { if (e.target.id === id) closeModal(id); }
 // ─── INIT ──────────────────────────────────────────────────────────────
 document.getElementById('view-grid').addEventListener('click', () => setView('grid'));
 document.getElementById('view-list').addEventListener('click', () => setView('list'));
+document.getElementById('iview-grid').addEventListener('click', () => setItemView('grid'));
+document.getElementById('iview-list').addEventListener('click', () => setItemView('list'));
 render();
 loadFromSheet();
+loadItemsFromSheet();
 </script>
 </body>
 </html>
