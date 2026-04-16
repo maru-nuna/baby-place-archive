@@ -717,8 +717,11 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
 
     <div class="form-group">
       <label class="form-label">장소 사진 <span style="color:var(--text-muted);font-weight:400">(선택)</span></label>
-      <div class="img-upload-wrap" onclick="document.getElementById('imgInput').click()">
-        📷 사진 추가
+      <div class="img-upload-wrap" id="placeImgDrop"
+           onclick="document.getElementById('imgInput').click()"
+           ondragover="event.preventDefault()"
+           ondrop="handleImgDrop(event,'imgPreview','place')">
+        📷 클릭 · 드래그 · <kbd style="font-size:11px;background:var(--sand);border-radius:4px;padding:1px 5px">⌘V</kbd> 붙여넣기
         <input type="file" id="imgInput" accept="image/*" style="display:none" onchange="handleImg(event)">
       </div>
       <img id="imgPreview" class="img-preview-img" style="display:none" />
@@ -830,10 +833,18 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
       <label class="form-label">특이사항 <span style="color:var(--text-muted);font-weight:400">(선택)</span></label>
       <textarea class="form-textarea" id="iinp-note" placeholder="예: 사이즈 70, 색상 민트"></textarea>
     </div>
-    <!-- 썸네일 미리보기 (og:image 자동 로드) -->
-    <div id="iThumbWrap" style="display:none;margin-bottom:18px">
-      <label class="form-label">썸네일 미리보기</label>
-      <img id="iThumbPreview" style="width:100%;height:160px;object-fit:cover;border-radius:var(--radius-md)" />
+    <!-- 썸네일 미리보기 (og:image 자동 로드 or 붙여넣기) -->
+    <div id="iThumbWrap" style="margin-bottom:18px">
+      <label class="form-label">사진 <span style="color:var(--text-muted);font-weight:400">(선택 · 링크 입력 시 자동 로드)</span></label>
+      <div class="img-upload-wrap" id="itemImgDrop"
+           onclick="document.getElementById('iImgInput').click()"
+           ondragover="event.preventDefault()"
+           ondrop="handleImgDrop(event,'iThumbPreview','item')"
+           style="margin-bottom:8px">
+        📷 클릭 · 드래그 · <kbd style="font-size:11px;background:var(--sand);border-radius:4px;padding:1px 5px">⌘V</kbd> 붙여넣기
+        <input type="file" id="iImgInput" accept="image/*" style="display:none" onchange="handleItemImgFile(event)">
+      </div>
+      <img id="iThumbPreview" style="width:100%;height:160px;object-fit:cover;border-radius:var(--radius-md);display:none" />
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="tryItemCancel()">취소</button>
@@ -1265,15 +1276,47 @@ function updateDistHint() {
   }
 }
 
-function handleImg(e) {
-  const file = e.target.files[0]; if (!file) return;
+// ─── 이미지 공통 핸들러 ────────────────────────────────────────────────
+function readImgFile(file, previewId, target) {
+  if (!file || !file.type.startsWith('image/')) return;
   const reader = new FileReader();
   reader.onload = ev => {
-    currentImg = ev.target.result;
-    document.getElementById('imgPreview').src = currentImg;
-    document.getElementById('imgPreview').style.display = 'block';
+    const src = ev.target.result;
+    const preview = document.getElementById(previewId);
+    preview.src = src; preview.style.display = 'block';
+    if (target === 'place') currentImg = src;
+    else currentItemImg = src;
   };
   reader.readAsDataURL(file);
+}
+
+function handleImgDrop(e, previewId, target) {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  readImgFile(file, previewId, target);
+}
+
+function handleItemImgFile(e) {
+  readImgFile(e.target.files[0], 'iThumbPreview', 'item');
+}
+
+// 클립보드 붙여넣기 (모달 열려있을 때만)
+document.addEventListener('paste', e => {
+  const items = e.clipboardData.items;
+  for (const item of items) {
+    if (!item.type.startsWith('image/')) continue;
+    const file = item.getAsFile();
+    if (document.getElementById('addOverlay').classList.contains('open')) {
+      readImgFile(file, 'imgPreview', 'place');
+    } else if (document.getElementById('itemAddOverlay').classList.contains('open')) {
+      readImgFile(file, 'iThumbPreview', 'item');
+    }
+    break;
+  }
+});
+
+function handleImg(e) {
+  readImgFile(e.target.files[0], 'imgPreview', 'place');
 }
 
 function tryCancel() {
@@ -1750,7 +1793,7 @@ function resetItemForm() {
   document.getElementById('iinp-shipping-wrap').style.display = 'none';
   document.getElementById('iinp-shipping-placeholder').style.display = 'block';
   document.getElementById('iinp-link-hint').textContent = '';
-  document.getElementById('iThumbWrap').style.display = 'none';
+  document.getElementById('iThumbPreview').style.display = 'none';
   document.getElementById('iThumbPreview').src = '';
   document.querySelectorAll('#itemAddOverlay .input-error').forEach(el => el.classList.remove('input-error'));
   currentItemImg = null;
@@ -1819,14 +1862,14 @@ function onItemLinkInput(val) {
       const data = await res.json();
       if (data.result === 'success' && data.imageUrl) {
         currentItemImg = data.imageUrl;
-        document.getElementById('iThumbPreview').src = data.imageUrl;
-        document.getElementById('iThumbWrap').style.display = 'block';
+        const prev = document.getElementById('iThumbPreview');
+        prev.src = data.imageUrl; prev.style.display = 'block';
         hint.textContent = '✅ 썸네일을 불러왔어요';
         hint.style.color = 'var(--sage-hover)';
       } else {
         currentItemImg = null;
-        document.getElementById('iThumbWrap').style.display = 'none';
-        hint.textContent = '이미지를 찾을 수 없어요. 첫 글자로 표시돼요.';
+        document.getElementById('iThumbPreview').style.display = 'none';
+        hint.textContent = '이미지를 찾을 수 없어요. 직접 추가하거나 첫 글자로 표시돼요.';
         hint.style.color = 'var(--text-muted)';
       }
     } catch(e) {
