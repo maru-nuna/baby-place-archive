@@ -395,6 +395,10 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
   transition: border-color 0.16s, box-shadow 0.16s; outline: none;
   appearance: none;
 }
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
 .form-input:focus, .form-textarea:focus, .form-select:focus {
   border-color: var(--rose); box-shadow: 0 0 0 3px var(--rose-light);
   background: #fff;
@@ -810,7 +814,7 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
         <input class="form-input" id="iinp-price" type="number" placeholder="예: 15000" />
       </div>
       <div class="form-group">
-        <div class="form-label" style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
+        <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;height:20px">
           <label class="check-item" style="margin:0">
             <input type="checkbox" id="iinp-shipping-check" onchange="toggleShipping(this.checked)">
             <div class="check-box"></div>
@@ -830,22 +834,27 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
       <input class="form-input" id="iinp-link" placeholder="https://..." oninput="onItemLinkInput(this.value)" />
       <div class="form-hint" id="iinp-link-hint"></div>
     </div>
+    <div class="form-group">
       <label class="form-label">특이사항 <span style="color:var(--text-muted);font-weight:400">(선택)</span></label>
       <textarea class="form-textarea" id="iinp-note" placeholder="예: 사이즈 70, 색상 민트"></textarea>
     </div>
-    <!-- 썸네일 미리보기 (og:image 자동 로드 or 붙여넣기) -->
-    <div id="iThumbWrap" style="margin-bottom:18px">
+    <div class="form-group">
       <label class="form-label">사진 <span style="color:var(--text-muted);font-weight:400">(선택 · 링크 입력 시 자동 로드)</span></label>
       <div class="img-upload-wrap" id="itemImgDrop"
            onclick="document.getElementById('iImgInput').click()"
            ondragover="event.preventDefault()"
-           ondrop="handleImgDrop(event,'iThumbPreview','item')"
-           style="margin-bottom:8px">
+           ondrop="handleImgDrop(event,'iThumbPreview','item')">
         📷 클릭 · 드래그 · <kbd style="font-size:11px;background:var(--sand);border-radius:4px;padding:1px 5px">⌘V</kbd> 붙여넣기
         <input type="file" id="iImgInput" accept="image/*" style="display:none" onchange="handleItemImgFile(event)">
       </div>
-      <img id="iThumbPreview" style="width:100%;height:160px;object-fit:cover;border-radius:var(--radius-md);display:none" />
+      <img id="iThumbPreview" class="img-preview-img" style="display:none" />
     </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="tryItemCancel()">취소</button>
+      <button class="btn btn-primary" onclick="saveItem()">저장하기</button>
+    </div>
+  </div>
+</div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="tryItemCancel()">취소</button>
       <button class="btn btn-primary" onclick="saveItem()">저장하기</button>
@@ -1626,7 +1635,7 @@ function itemCardHTML(it) {
     <div class="card-img-wrap">${imgHTML}</div>
     <div class="card-body">
       <div class="card-name">${it.name}</div>
-      <div class="item-card-price">${formatPrice(Number(it.price) + Number(it.shipping || 0))}${it.shipping ? ` <span style="font-size:10px;font-weight:400;color:var(--text-muted)">(배송비 ${formatPrice(it.shipping)} 포함)</span>` : ''}</div>
+      <div class="item-card-price">${formatPrice(Number(it.price) + Number(it.shipping || 0))}${Number(it.shipping) > 0 ? ` <span style="font-size:10px;font-weight:400;color:var(--text-muted)">(배송비 포함)</span>` : ''}</div>
       <div data-price-id="${it.id}">${priceCache[it.id] != null ? getPriceBadgeHTML(it) : '<div class="price-badge loading">가격 확인 중...</div>'}</div>
       ${it.note ? `<div class="card-feature">${it.note}</div>` : ''}
       ${it.link ? `<a class="item-card-link" href="${it.link}" target="_blank" onclick="event.stopPropagation()">🔗 구매링크</a>` : ''}
@@ -1766,10 +1775,17 @@ function openItemDetail(id) {
   const imgHTML = it.img
     ? `<img class="detail-img" src="${it.img}" alt="${it.name}">`
     : `<div class="detail-no-img">🛍</div>`;
+  const shipping = Number(it.shipping || 0);
+  const total = Number(it.price) + shipping;
+  const priceHTML = shipping
+    ? `<div class="item-card-price" style="font-size:18px;margin-bottom:4px">${formatPrice(total)}</div>
+       <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">상품 ${formatPrice(it.price)} + 배송비 ${formatPrice(shipping)}</div>`
+    : `<div class="item-card-price" style="font-size:18px;margin-bottom:12px">${formatPrice(it.price)}</div>`;
+
   document.getElementById('itemDetailBody').innerHTML = `
     ${imgHTML}
     <div class="detail-name">${it.name}</div>
-    <div class="item-card-price" style="font-size:18px;margin-bottom:12px">${formatPrice(it.price)}</div>
+    ${priceHTML}
     ${it.link ? `<a class="item-card-link" href="${it.link}" target="_blank" style="font-size:13px;padding:6px 14px;margin-bottom:12px;display:inline-flex">🔗 구매링크 바로가기</a>` : ''}
     ${it.note ? `<div class="detail-feature" style="margin-top:10px">${it.note}</div>` : ''}
     <div class="detail-date">${formatDate(it.id)}</div>
@@ -1795,6 +1811,7 @@ function resetItemForm() {
   document.getElementById('iinp-link-hint').textContent = '';
   document.getElementById('iThumbPreview').style.display = 'none';
   document.getElementById('iThumbPreview').src = '';
+  document.getElementById('iImgInput').value = '';
   document.querySelectorAll('#itemAddOverlay .input-error').forEach(el => el.classList.remove('input-error'));
   currentItemImg = null;
 }
