@@ -808,20 +808,18 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
       </div>
       <div class="form-group">
         <label class="form-label">구매 링크 <span class="req">*</span></label>
-        <input class="form-input" id="iinp-link" placeholder="https://..." />
+        <input class="form-input" id="iinp-link" placeholder="https://..." oninput="onItemLinkInput(this.value)" />
+        <div class="form-hint" id="iinp-link-hint"></div>
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">특이사항 <span style="color:var(--text-muted);font-weight:400">(선택)</span></label>
       <textarea class="form-textarea" id="iinp-note" placeholder="예: 사이즈 70, 색상 민트"></textarea>
     </div>
-    <div class="form-group">
-      <label class="form-label">사진 <span style="color:var(--text-muted);font-weight:400">(선택)</span></label>
-      <div class="img-upload-wrap" onclick="document.getElementById('iImgInput').click()">
-        📷 사진 추가
-        <input type="file" id="iImgInput" accept="image/*" style="display:none" onchange="handleItemImg(event)">
-      </div>
-      <img id="iImgPreview" class="img-preview-img" style="display:none" />
+    <!-- 썸네일 미리보기 (og:image 자동 로드) -->
+    <div id="iThumbWrap" style="display:none;margin-bottom:18px">
+      <label class="form-label">썸네일 미리보기</label>
+      <img id="iThumbPreview" style="width:100%;height:160px;object-fit:cover;border-radius:var(--radius-md)" />
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="tryItemCancel()">취소</button>
@@ -1350,7 +1348,7 @@ function saveHome() {
 }
 
 // ─── GOOGLE SHEETS 연동 ───────────────────────────────────────────────
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0MFW_N2nhW9O323mNkhwo_gHRJpVkrHbmOrwYTQOto28IRWCs7Q3owrhK8GmDTh00LQ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzI3cNFg1ka-DPz1g54IQAMi_4UImupQn5S7cYtPwsSvVF_QMGQflSeCdD-R8WAmTaF5A/exec';
 
 async function forceSyncAll() {
   if (places.length === 0) { showToast('저장된 장소가 없어요', 'info'); return; }
@@ -1727,13 +1725,13 @@ function openItemDetail(id) {
 
 // ─── ITEM ADD / EDIT ──────────────────────────────────────────────────
 function resetItemForm() {
-  document.getElementById('iinp-name').value = '';
+  document.getElementById('iinp-name').value  = '';
   document.getElementById('iinp-price').value = '';
-  document.getElementById('iinp-link').value = '';
-  document.getElementById('iinp-note').value = '';
-  document.getElementById('iImgInput').value = '';
-  document.getElementById('iImgPreview').style.display = 'none';
-  document.getElementById('iImgPreview').src = '';
+  document.getElementById('iinp-link').value  = '';
+  document.getElementById('iinp-note').value  = '';
+  document.getElementById('iinp-link-hint').textContent = '';
+  document.getElementById('iThumbWrap').style.display = 'none';
+  document.getElementById('iThumbPreview').src = '';
   document.querySelectorAll('#itemAddOverlay .input-error').forEach(el => el.classList.remove('input-error'));
   currentItemImg = null;
 }
@@ -1767,21 +1765,42 @@ function openItemEdit(e, id) {
   document.getElementById('iinp-link').value  = it.link || '';
   document.getElementById('iinp-note').value  = it.note || '';
   currentItemImg = it.img || null;
-  if (it.img) { document.getElementById('iImgPreview').src = it.img; document.getElementById('iImgPreview').style.display = 'block'; }
+  if (it.img) {
+    document.getElementById('iThumbPreview').src = it.img;
+    document.getElementById('iThumbWrap').style.display = 'block';
+  }
   document.getElementById('itemModalTitle').textContent = '물건 수정';
   itemOriginalSnapshot = getItemSnapshot();
   openModal('itemAddOverlay');
 }
 
-function handleItemImg(e) {
-  const file = e.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => {
-    currentItemImg = ev.target.result;
-    document.getElementById('iImgPreview').src = currentItemImg;
-    document.getElementById('iImgPreview').style.display = 'block';
-  };
-  reader.readAsDataURL(file);
+let linkFetchTimer = null;
+function onItemLinkInput(val) {
+  clearTimeout(linkFetchTimer);
+  const hint = document.getElementById('iinp-link-hint');
+  if (!val || !val.startsWith('http')) { hint.textContent = ''; return; }
+  hint.textContent = '🔍 썸네일 불러오는 중...';
+  linkFetchTimer = setTimeout(async () => {
+    try {
+      const res = await fetch(`${APPS_SCRIPT_URL}?action=fetchOgImage&url=${encodeURIComponent(val)}&t=${Date.now()}`);
+      const data = await res.json();
+      if (data.result === 'success' && data.imageUrl) {
+        currentItemImg = data.imageUrl;
+        document.getElementById('iThumbPreview').src = data.imageUrl;
+        document.getElementById('iThumbWrap').style.display = 'block';
+        hint.textContent = '✅ 썸네일을 불러왔어요';
+        hint.style.color = 'var(--sage-hover)';
+      } else {
+        currentItemImg = null;
+        document.getElementById('iThumbWrap').style.display = 'none';
+        hint.textContent = '이미지를 찾을 수 없어요. 첫 글자로 표시돼요.';
+        hint.style.color = 'var(--text-muted)';
+      }
+    } catch(e) {
+      hint.textContent = '썸네일 로드 실패. 첫 글자로 표시돼요.';
+      hint.style.color = 'var(--text-muted)';
+    }
+  }, 800); // 입력 멈추고 0.8초 후 요청
 }
 
 function tryItemCancel() {
