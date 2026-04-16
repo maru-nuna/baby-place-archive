@@ -631,8 +631,8 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
       <div class="banner-title" style="color:#5060C0">도영이를 위한 물건 🛍</div>
       <div class="banner-sub">사고 싶은 것들을 모아두자!</div>
       <div class="banner-meta">
-        <div class="banner-addr" style="cursor:default;color:#5060C0">
-          <span>🛍</span><span id="itemSummary">총 0개 · 총 0원</span>
+        <div class="banner-addr" onclick="openHomeModal()" style="color:#5060C0">
+          <span>🏠</span><span id="homeAddrTextItem">집주소를 설정해주세요</span>
         </div>
         <span class="banner-count" id="itemCount"></span>
       </div>
@@ -807,12 +807,26 @@ main { max-width: 1040px; margin: 0 auto; padding: 32px 28px 60px; }
         <input class="form-input" id="iinp-price" type="number" placeholder="예: 15000" />
       </div>
       <div class="form-group">
-        <label class="form-label">구매 링크 <span class="req">*</span></label>
-        <input class="form-input" id="iinp-link" placeholder="https://..." oninput="onItemLinkInput(this.value)" />
-        <div class="form-hint" id="iinp-link-hint"></div>
+        <div class="form-label" style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
+          <label class="check-item" style="margin:0">
+            <input type="checkbox" id="iinp-shipping-check" onchange="toggleShipping(this.checked)">
+            <div class="check-box"></div>
+            <span class="check-label" style="font-size:12px;font-weight:600;color:var(--text-sub)">배송비</span>
+          </label>
+        </div>
+        <div id="iinp-shipping-wrap" style="display:none">
+          <input class="form-input" id="iinp-shipping" type="number" placeholder="예: 3000" />
+        </div>
+        <div id="iinp-shipping-placeholder">
+          <input class="form-input" disabled placeholder="체크 후 입력" style="opacity:0.38;cursor:default" />
+        </div>
       </div>
     </div>
     <div class="form-group">
+      <label class="form-label">구매 링크 <span class="req">*</span></label>
+      <input class="form-input" id="iinp-link" placeholder="https://..." oninput="onItemLinkInput(this.value)" />
+      <div class="form-hint" id="iinp-link-hint"></div>
+    </div>
       <label class="form-label">특이사항 <span style="color:var(--text-muted);font-weight:400">(선택)</span></label>
       <textarea class="form-textarea" id="iinp-note" placeholder="예: 사이즈 70, 색상 민트"></textarea>
     </div>
@@ -1348,7 +1362,7 @@ function saveHome() {
 }
 
 // ─── GOOGLE SHEETS 연동 ───────────────────────────────────────────────
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzI3cNFg1ka-DPz1g54IQAMi_4UImupQn5S7cYtPwsSvVF_QMGQflSeCdD-R8WAmTaF5A/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxi8FnxlgTC3YgMWA3IlZk7h8KktqCVc3Mmh7VI_gMoFRdS6WLisJkZYbY0kshn_aWqdg/exec';
 
 async function forceSyncAll() {
   if (places.length === 0) { showToast('저장된 장소가 없어요', 'info'); return; }
@@ -1389,7 +1403,7 @@ async function syncItemsToSheet() {
 async function loadFromSheet(showFeedback = false) {
   try {
     if (showFeedback) showToast('📋 데이터 불러오는 중...', 'info');
-    const res = await fetch(APPS_SCRIPT_URL + '?t=' + Date.now());
+    const res = await fetch(APPS_SCRIPT_URL + '?t=' + Date.now(), { redirect: 'follow' });
     const data = await res.json();
     if (data.result === 'success' && data.places.length > 0) {
       places = data.places.map(p => ({
@@ -1403,20 +1417,22 @@ async function loadFromSheet(showFeedback = false) {
       if (showFeedback) showToast('✅ 데이터를 불러왔어요', 'success');
     }
   } catch(e) {
+    console.warn('장소 불러오기 실패:', e);
     if (showFeedback) showToast('⚠️ 데이터 불러오기 실패', 'error');
   }
 }
 
 async function loadItemsFromSheet() {
   try {
-    const res = await fetch(APPS_SCRIPT_URL + '?action=getItems&t=' + Date.now());
+    const res = await fetch(APPS_SCRIPT_URL + '?action=getItems&t=' + Date.now(), { redirect: 'follow' });
     const data = await res.json();
     if (data.result === 'success' && data.items.length > 0) {
       items = data.items.map(i => ({
         ...i, id: Number(i.id),
-        price:  Number(i.price),
-        bought: i.bought === true || i.bought === 'TRUE',
-        img:    i.img || null,
+        price:    Number(i.price),
+        shipping: Number(i.shipping || 0),
+        bought:   i.bought === true || i.bought === 'TRUE',
+        img:      i.img || null,
       }));
       localStorage.setItem('baby-items', JSON.stringify(items));
       if (currentTab === 'item') renderItems();
@@ -1510,11 +1526,11 @@ function formatPrice(n) {
 function renderItems() {
   const total = items.length;
   const bought = items.filter(i => i.bought).length;
-  const totalPrice = items.reduce((sum, i) => sum + Number(i.price || 0), 0);
-  document.getElementById('itemSummary').textContent =
-    `총 ${total}개 · 총 ${totalPrice.toLocaleString('ko-KR')}원`;
+  const totalPrice = items.reduce((sum, i) => sum + Number(i.price || 0) + Number(i.shipping || 0), 0);
+  const fullAddr = homeAddress ? (homeDetail ? `${homeAddress} ${homeDetail}` : homeAddress) : '집주소를 설정해주세요';
+  document.getElementById('homeAddrTextItem').textContent = fullAddr;
   document.getElementById('itemCount').textContent =
-    total ? `구매완료 ${bought}개` : '';
+    total ? `총 ${total}개 · 총 ${totalPrice.toLocaleString('ko-KR')}원` : '';
 
   const notBought = items.filter(i => !i.bought);
   const boughtList = items.filter(i => i.bought);
@@ -1567,7 +1583,7 @@ function itemCardHTML(it) {
     <div class="card-img-wrap">${imgHTML}</div>
     <div class="card-body">
       <div class="card-name">${it.name}</div>
-      <div class="item-card-price">${formatPrice(it.price)}</div>
+      <div class="item-card-price">${formatPrice(Number(it.price) + Number(it.shipping || 0))}${it.shipping ? ` <span style="font-size:10px;font-weight:400;color:var(--text-muted)">(배송비 ${formatPrice(it.shipping)} 포함)</span>` : ''}</div>
       <div data-price-id="${it.id}">${priceCache[it.id] != null ? getPriceBadgeHTML(it) : '<div class="price-badge loading">가격 확인 중...</div>'}</div>
       ${it.note ? `<div class="card-feature">${it.note}</div>` : ''}
       ${it.link ? `<a class="item-card-link" href="${it.link}" target="_blank" onclick="event.stopPropagation()">🔗 구매링크</a>` : ''}
@@ -1729,6 +1745,10 @@ function resetItemForm() {
   document.getElementById('iinp-price').value = '';
   document.getElementById('iinp-link').value  = '';
   document.getElementById('iinp-note').value  = '';
+  document.getElementById('iinp-shipping-check').checked = false;
+  document.getElementById('iinp-shipping').value = '';
+  document.getElementById('iinp-shipping-wrap').style.display = 'none';
+  document.getElementById('iinp-shipping-placeholder').style.display = 'block';
   document.getElementById('iinp-link-hint').textContent = '';
   document.getElementById('iThumbWrap').style.display = 'none';
   document.getElementById('iThumbPreview').src = '';
@@ -1736,13 +1756,20 @@ function resetItemForm() {
   currentItemImg = null;
 }
 
+function toggleShipping(checked) {
+  document.getElementById('iinp-shipping-wrap').style.display = checked ? 'block' : 'none';
+  document.getElementById('iinp-shipping-placeholder').style.display = checked ? 'none' : 'block';
+  if (!checked) document.getElementById('iinp-shipping').value = '';
+}
+
 function getItemSnapshot() {
   return JSON.stringify({
-    name:  document.getElementById('iinp-name').value,
-    price: document.getElementById('iinp-price').value,
-    link:  document.getElementById('iinp-link').value,
-    note:  document.getElementById('iinp-note').value,
-    img:   currentItemImg
+    name:     document.getElementById('iinp-name').value,
+    price:    document.getElementById('iinp-price').value,
+    link:     document.getElementById('iinp-link').value,
+    note:     document.getElementById('iinp-note').value,
+    shipping: document.getElementById('iinp-shipping').value,
+    img:      currentItemImg
   });
 }
 
@@ -1764,6 +1791,12 @@ function openItemEdit(e, id) {
   document.getElementById('iinp-price').value = it.price;
   document.getElementById('iinp-link').value  = it.link || '';
   document.getElementById('iinp-note').value  = it.note || '';
+  if (it.shipping) {
+    document.getElementById('iinp-shipping-check').checked = true;
+    document.getElementById('iinp-shipping-wrap').style.display = 'block';
+    document.getElementById('iinp-shipping-placeholder').style.display = 'none';
+    document.getElementById('iinp-shipping').value = it.shipping;
+  }
   currentItemImg = it.img || null;
   if (it.img) {
     document.getElementById('iThumbPreview').src = it.img;
@@ -1810,10 +1843,12 @@ function tryItemCancel() {
 function forceItemCancel() { closeModal('itemCancelOverlay'); closeModal('itemAddOverlay'); }
 
 function saveItem() {
-  const name  = document.getElementById('iinp-name').value.trim();
-  const price = document.getElementById('iinp-price').value;
-  const link  = document.getElementById('iinp-link').value.trim();
-  const note  = document.getElementById('iinp-note').value.trim();
+  const name     = document.getElementById('iinp-name').value.trim();
+  const price    = document.getElementById('iinp-price').value;
+  const link     = document.getElementById('iinp-link').value.trim();
+  const note     = document.getElementById('iinp-note').value.trim();
+  const shipping = document.getElementById('iinp-shipping-check').checked
+    ? Number(document.getElementById('iinp-shipping').value) || 0 : 0;
 
   const invalidFields = [];
   if (!name)  invalidFields.push(document.getElementById('iinp-name'));
@@ -1832,9 +1867,9 @@ function saveItem() {
 
   if (editingItemId !== null) {
     const it = items.find(x => x.id === editingItemId);
-    if (it) Object.assign(it, { name, price: Number(price), link, note, img: currentItemImg });
+    if (it) Object.assign(it, { name, price: Number(price), link, note, shipping, img: currentItemImg });
   } else {
-    items.push({ id: Date.now(), name, price: Number(price), link, note, img: currentItemImg, bought: false });
+    items.push({ id: Date.now(), name, price: Number(price), link, note, shipping, img: currentItemImg, bought: false });
   }
   saveItems(); renderItems();
   closeModal('itemAddOverlay');
